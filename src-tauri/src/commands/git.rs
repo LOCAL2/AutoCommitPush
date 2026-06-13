@@ -478,11 +478,9 @@ pub fn push_to_remote(path: String, token: String, branch: String) -> Result<Str
     let repo = Repository::open(&path).map_err(|e| e.to_string())?;
 
     // ── Resolve actual branch name ────────────────────────────────────────────
-    // The caller might pass "main" but repo HEAD could be "master" or unborn
     let actual_branch = if let Ok(head) = repo.head() {
         head.shorthand().unwrap_or(&branch).to_string()
     } else {
-        // HEAD is unborn — no commits at all
         return Err(
             "Repository has no commits yet. Please make at least one commit before pushing."
                 .to_string(),
@@ -498,6 +496,54 @@ pub fn push_to_remote(path: String, token: String, branch: String) -> Result<Str
         ));
     }
 
+    // ── Step 1: Fetch remote to check for new commits ─────────────────────────
+    {
+        let mut remote = repo.find_remote("origin").map_err(|e| e.to_string())?;
+        let mut callbacks = RemoteCallbacks::new();
+        let token_clone = token.clone();
+        callbacks.credentials(move |_url, _username, _allowed| {
+            Cred::userpass_plaintext(&token_clone, "")
+        });
+        let mut fetch_opts = FetchOptions::new();
+        fetch_opts.remote_callbacks(callbacks);
+        // Fetch quietly — ignore error if remote branch doesn't exist yet (first push)
+        let _ = remote.fetch(&[&actual_branch], Some(&mut fetch_opts), None);
+    }
+
+    // ── Step 2: If remote is ahead, fast-forward merge before pushing ─────────
+    if let Ok(fetch_head) = repo.find_reference("FETCH_HEAD") {
+        if let Ok(fetch_commit) = repo.reference_to_annotated_commit(&fetch_head) {
+            if let Ok((analysis, _)) = repo.merge_analysis(&[&fetch_commit]) {
+                if analysis.is_up_to_date() {
+                    // Remote is not ahead — nothing to merge
+                } else if analysis.is_fast_forward() {
+                    // Remote has new commits we can fast-forward into
+                    let mut reference = repo
+                        .find_reference(&ref_name)
+                        .map_err(|e| e.to_string())?;
+                    reference
+                        .set_target(fetch_commit.id(), "Fast-forward before push")
+                        .map_err(|e| e.to_string())?;
+                    repo.set_head(&ref_name).map_err(|e| e.to_string())?;
+                    repo.checkout_head(Some(git2::build::CheckoutBuilder::default().force()))
+                        .map_err(|e| e.to_string())?;
+                } else if !analysis.is_normal() {
+                    // Can't fast-forward — diverged histories
+                    return Err(
+                        "Push failed: remote has diverged commits that cannot be automatically merged. Please pull and resolve conflicts manually.".to_string()
+                    );
+                }
+                // analysis.is_normal() means a real merge is needed — also block
+                else {
+                    return Err(
+                        "Push failed: remote has diverged commits that cannot be automatically merged. Please pull and resolve conflicts manually.".to_string()
+                    );
+                }
+            }
+        }
+    }
+
+    // ── Step 3: Push ──────────────────────────────────────────────────────────
     let mut remote = repo.find_remote("origin").map_err(|e| e.to_string())?;
 
     let mut callbacks = RemoteCallbacks::new();
@@ -509,7 +555,6 @@ pub fn push_to_remote(path: String, token: String, branch: String) -> Result<Str
     let mut push_opts = PushOptions::new();
     push_opts.remote_callbacks(callbacks);
 
-    // Push actual branch (not necessarily what caller requested)
     let refspec = format!("refs/heads/{}:refs/heads/{}", actual_branch, actual_branch);
     remote
         .push(&[&refspec], Some(&mut push_opts))
