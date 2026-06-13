@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   FolderOpen, Plus, Trash2, Edit2, ExternalLink, Search,
   GitBranch, UploadCloud, AlertCircle, Check, X, RefreshCw,
-  Github, Lock, Unlock, Container,
+  Github, Lock, Unlock, Container, CheckCircle2,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useToast } from "@/components/ui/toast";
 import * as cmd from "@/lib/tauri-commands";
 import type { RepoStatus, GitHubRepo } from "@/types";
-import { truncatePath } from "@/lib/utils";
+import { truncatePath, formatDate } from "@/lib/utils";
 import CreateRepoDialog from "@/components/CreateRepoDialog";
 import DockerPushDialog from "@/components/DockerPushDialog";
 import PushConfirmDialog from "@/components/PushConfirmDialog";
@@ -208,11 +208,16 @@ function LocalTab() {
       setCardState(id, { pushProgress: 70 });
       await cmd.pushToRemote(path, token!, branch);
       setCardState(id, { pushProgress: 100 });
-      updateProject(id, { lastPushedAt: new Date().toISOString() });
+      updateProject(id, {
+        lastPushedAt: new Date().toISOString(),
+        lastPushStatus: "success",
+        lastCommitMessage: commitMsg,
+      });
       addLog("success", `Push successful → ${branch}`, id, label);
       showToast("success", "Pushed successfully!");
       await loadStatus(id, path);
     } catch (e) {
+      updateProject(id, { lastPushStatus: "error" });
       addLog("error", `Push failed: ${e}`, id, label);
       showToast("error", `Push failed: ${e}`);
     } finally {
@@ -309,18 +314,58 @@ function LocalTab() {
 
                 {/* Repo info */}
                 {status?.is_git_repo && (
-                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1.5">
-                      <GitBranch className="h-3.5 w-3.5" />
+                  <div className="mt-3 space-y-1.5">
+                    {/* Branch + last commit message */}
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <GitBranch className="h-3.5 w-3.5 shrink-0" />
                       <span className="font-mono">{status.branch ?? "main"}</span>
                       {!status.last_commit && (
                         <span className="text-github-orange text-[10px]">(no commits)</span>
                       )}
                     </div>
-                    {status.last_commit
-                      ? <div className="truncate">{status.last_commit}</div>
-                      : <div className="text-muted-foreground/50 italic">No commits yet</div>
-                    }
+                    {/* Last commit text */}
+                    {status.last_commit ? (
+                      <div className="flex items-start gap-1.5 text-xs">
+                        <span className="text-muted-foreground shrink-0 mt-px">Commit:</span>
+                        <span className="font-mono text-foreground/80 truncate" title={status.last_commit}>
+                          {status.last_commit}
+                        </span>
+                        {status.last_commit_time && (
+                          <span className="text-muted-foreground/60 shrink-0 ml-auto">
+                            {status.last_commit_time}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground/50 italic">No commits yet</p>
+                    )}
+                    {/* Last push status */}
+                    {project.lastPushedAt && (
+                      <div className="flex items-center gap-1.5 text-xs">
+                        {project.lastPushStatus === "success" ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-github-green shrink-0" />
+                        ) : project.lastPushStatus === "error" ? (
+                          <AlertCircle className="h-3.5 w-3.5 text-github-red shrink-0" />
+                        ) : (
+                          <UploadCloud className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        )}
+                        <span className={
+                          project.lastPushStatus === "success"
+                            ? "text-github-green"
+                            : project.lastPushStatus === "error"
+                            ? "text-github-red"
+                            : "text-muted-foreground"
+                        }>
+                          {project.lastPushStatus === "success" ? "Pushed" : project.lastPushStatus === "error" ? "Push failed" : "Pushed"}
+                        </span>
+                        <span className="text-muted-foreground/60">{formatDate(project.lastPushedAt)}</span>
+                        {project.lastCommitMessage && (
+                          <span className="text-muted-foreground/50 truncate ml-1" title={project.lastCommitMessage}>
+                            · {project.lastCommitMessage}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 

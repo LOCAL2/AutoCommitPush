@@ -28,6 +28,8 @@ export const useProjectStore = create<ProjectState>()(
           path,
           createdAt: new Date().toISOString(),
           lastPushedAt: null,
+          lastPushStatus: null,
+          lastCommitMessage: null,
           autoCommitEnabled: false,
           autoCommitInterval: 15,
           defaultBranch: "main",

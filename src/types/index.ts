@@ -15,6 +15,8 @@ export interface Project {
   path: string;
   createdAt: string;
   lastPushedAt: string | null;
+  lastPushStatus: "success" | "error" | null;
+  lastCommitMessage: string | null;
   autoCommitEnabled: boolean;
   autoCommitInterval: number; // minutes: 5|15|30|60
   defaultBranch: string;
