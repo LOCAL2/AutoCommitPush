@@ -510,14 +510,15 @@ pub fn push_to_remote(path: String, token: String, branch: String) -> Result<Str
         let _ = remote.fetch(&[&actual_branch], Some(&mut fetch_opts), None);
     }
 
-    // ── Step 2: If remote is ahead, fast-forward merge before pushing ─────────
+    // ── Step 2: Sync with remote before pushing ───────────────────────────────
     if let Ok(fetch_head) = repo.find_reference("FETCH_HEAD") {
         if let Ok(fetch_commit) = repo.reference_to_annotated_commit(&fetch_head) {
             if let Ok((analysis, _)) = repo.merge_analysis(&[&fetch_commit]) {
                 if analysis.is_up_to_date() {
                     // Remote is not ahead — nothing to merge
+
                 } else if analysis.is_fast_forward() {
-                    // Remote has new commits we can fast-forward into
+                    // Remote only has new commits — fast-forward local branch
                     let mut reference = repo
                         .find_reference(&ref_name)
                         .map_err(|e| e.to_string())?;
@@ -527,17 +528,61 @@ pub fn push_to_remote(path: String, token: String, branch: String) -> Result<Str
                     repo.set_head(&ref_name).map_err(|e| e.to_string())?;
                     repo.checkout_head(Some(git2::build::CheckoutBuilder::default().force()))
                         .map_err(|e| e.to_string())?;
-                } else if !analysis.is_normal() {
-                    // Can't fast-forward — diverged histories
-                    return Err(
-                        "Push failed: remote has diverged commits that cannot be automatically merged. Please pull and resolve conflicts manually.".to_string()
+
+                } else if analysis.is_normal() {
+                    // Both local and remote have new commits — attempt 3-way merge
+                    let remote_commit = repo
+                        .find_commit(fetch_commit.id())
+                        .map_err(|e| e.to_string())?;
+
+                    // Merge the remote commit into the working tree
+                    repo.merge(
+                        &[&fetch_commit],
+                        None,
+                        Some(git2::build::CheckoutBuilder::default().allow_conflicts(true)),
+                    )
+                    .map_err(|e| e.to_string())?;
+
+                    // Check for conflicts
+                    let index = repo.index().map_err(|e| e.to_string())?;
+                    if index.has_conflicts() {
+                        // Clean up merge state so repo isn't stuck
+                        repo.cleanup_state().ok();
+                        return Err(
+                            "Push failed: automatic merge produced conflicts. Please pull and resolve conflicts manually.".to_string()
+                        );
+                    }
+
+                    // No conflicts — create merge commit
+                    let mut index = repo.index().map_err(|e| e.to_string())?;
+                    let tree_oid = index.write_tree().map_err(|e| e.to_string())?;
+                    index.write().map_err(|e| e.to_string())?;
+                    let tree = repo.find_tree(tree_oid).map_err(|e| e.to_string())?;
+
+                    let local_commit = repo
+                        .head()
+                        .map_err(|e| e.to_string())?
+                        .peel_to_commit()
+                        .map_err(|e| e.to_string())?;
+
+                    let sig = local_commit.author();
+                    let merge_message = format!(
+                        "Merge remote-tracking branch 'origin/{}'",
+                        actual_branch
                     );
-                }
-                // analysis.is_normal() means a real merge is needed — also block
-                else {
-                    return Err(
-                        "Push failed: remote has diverged commits that cannot be automatically merged. Please pull and resolve conflicts manually.".to_string()
-                    );
+
+                    repo.commit(
+                        Some("HEAD"),
+                        &sig,
+                        &sig,
+                        &merge_message,
+                        &tree,
+                        &[&local_commit, &remote_commit],
+                    )
+                    .map_err(|e| e.to_string())?;
+
+                    // Clean up MERGE_HEAD etc.
+                    repo.cleanup_state().map_err(|e| e.to_string())?;
                 }
             }
         }
