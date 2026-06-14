@@ -100,3 +100,13 @@ export const readReadme = (path: string) =>
 
 export const writeReadme = (path: string, content: string) =>
   invoke<string>("write_readme", { path, content });
+
+// ─── File System Explorer ─────────────────────────────────────────────────────
+export const listDirectories = (path: string) =>
+  invoke<{ name: string; path: string; is_git: boolean }[]>("list_directories", { path });
+
+export const getDrives = () =>
+  invoke<{ name: string; path: string }[]>("get_drives");
+
+export const getHomeDir = () =>
+  invoke<string | null>("get_home_dir");

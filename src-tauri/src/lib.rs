@@ -44,6 +44,9 @@ pub fn run() {
             commands::fs_ops::get_gitignore_template,
             commands::fs_ops::read_readme,
             commands::fs_ops::write_readme,
+            commands::fs_ops::list_directories,
+            commands::fs_ops::get_drives,
+            commands::fs_ops::get_home_dir,
             watcher::watch_project,
             watcher::unwatch_project,
         ])

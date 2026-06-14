@@ -24,6 +24,7 @@ import PushConfirmDialog from "@/components/PushConfirmDialog";
 import RemoveProjectDialog from "@/components/RemoveProjectDialog";
 import ChangesDiffPanel from "@/components/ChangesDiffPanel";
 import ReadmeEditor from "@/components/ReadmeEditor";
+import FolderPicker from "@/components/FolderPicker";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -520,6 +521,7 @@ function GitHubTab() {
   const [sort, setSort] = useState<SortKey>("updated");
   void setSort; // reserved for future sort UI
   const [cloning, setCloning] = useState<string | null>(null);
+  const [cloneTarget, setCloneTarget] = useState<{ repo: GitHubRepo } | null>(null);
 
   const loadRepos = useCallback(async () => {
     if (!token) return;
@@ -552,18 +554,17 @@ function GitHubTab() {
       return 0; // GitHub API already returns by updated
     });
 
-  const handleClone = async (repo: GitHubRepo) => {
+  const handleClone = (repo: GitHubRepo) => {
     if (!token) return;
+    setCloneTarget({ repo });
+  };
 
-    // Pick clone directory
-    const dir = await open({ directory: true, multiple: false, title: `Clone ${repo.name} to...` });
-    if (!dir || Array.isArray(dir)) return;
-
-    const targetPath = `${dir as string}\\${repo.name}`;
+  const doClone = async (repo: GitHubRepo, dir: string) => {
+    setCloneTarget(null);
+    const targetPath = `${dir}\\${repo.name}`;
     setCloning(repo.full_name);
     try {
-      await cmd.cloneRepository(repo.clone_url, targetPath, token);
-      // Auto-add to local projects
+      await cmd.cloneRepository(repo.clone_url, targetPath, token!);
       addProject(targetPath, repo.name);
       showToast("success", `Cloned ${repo.name} successfully!`);
     } catch (e) {
@@ -700,6 +701,16 @@ function GitHubTab() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Custom folder picker for clone */}
+      {cloneTarget && (
+        <FolderPicker
+          title={`Clone "${cloneTarget.repo.name}" to...`}
+          confirmLabel="Clone here"
+          onSelect={(dir) => doClone(cloneTarget.repo, dir)}
+          onCancel={() => setCloneTarget(null)}
+        />
       )}
     </div>
   );

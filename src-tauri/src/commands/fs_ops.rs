@@ -1,6 +1,80 @@
 use std::fs;
 use std::path::Path;
+use serde::Serialize;
 use tauri::command;
+
+#[derive(Debug, Serialize)]
+pub struct DirEntry {
+    pub name: String,
+    pub path: String,
+    pub is_git: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct DriveEntry {
+    pub name: String,
+    pub path: String,
+}
+
+/// List subdirectories of a given path
+#[command]
+pub fn list_directories(path: String) -> Result<Vec<DirEntry>, String> {
+    let base = Path::new(&path);
+    if !base.exists() {
+        return Err(format!("Path does not exist: {}", path));
+    }
+
+    let mut entries: Vec<DirEntry> = fs::read_dir(base)
+        .map_err(|e| e.to_string())?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
+        .filter_map(|e| {
+            let name = e.file_name().to_string_lossy().to_string();
+            // Skip hidden dirs (starting with .)
+            if name.starts_with('.') { return None; }
+            let full = e.path();
+            let is_git = full.join(".git").exists();
+            Some(DirEntry {
+                name,
+                path: full.to_string_lossy().replace('/', "\\").to_string(),
+                is_git,
+            })
+        })
+        .collect();
+
+    entries.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    Ok(entries)
+}
+
+/// Get available drives on Windows (C:\, D:\, etc.)
+#[command]
+pub fn get_drives() -> Vec<DriveEntry> {
+    #[cfg(target_os = "windows")]
+    {
+        let mut drives = Vec::new();
+        // Check drive letters A-Z
+        for letter in b'A'..=b'Z' {
+            let path = format!("{}:\\", letter as char);
+            if Path::new(&path).exists() {
+                drives.push(DriveEntry {
+                    name: format!("{}:", letter as char),
+                    path: path.clone(),
+                });
+            }
+        }
+        return drives;
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        vec![DriveEntry { name: "/".to_string(), path: "/".to_string() }]
+    }
+}
+
+/// Get the user's home directory
+#[command]
+pub fn get_home_dir() -> Option<String> {
+    dirs::home_dir().map(|p| p.to_string_lossy().to_string())
+}
 
 #[command]
 pub fn read_gitignore(path: String) -> Result<String, String> {
