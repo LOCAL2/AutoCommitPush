@@ -29,6 +29,7 @@ export interface RepoStatus {
   has_gitignore: boolean;
   branch: string | null;
   last_commit: string | null;
+  last_commit_hash: string | null;
   last_commit_time: string | null;
   remote_url: string | null;
   pending_changes: number;

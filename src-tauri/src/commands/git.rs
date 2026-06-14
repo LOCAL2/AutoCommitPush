@@ -13,6 +13,7 @@ pub struct RepoStatus {
     pub has_gitignore: bool,
     pub branch: Option<String>,
     pub last_commit: Option<String>,
+    pub last_commit_hash: Option<String>,
     pub last_commit_time: Option<String>,
     pub remote_url: Option<String>,
     pub pending_changes: u32,
@@ -64,6 +65,7 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
             has_gitignore,
             branch: None,
             last_commit: None,
+            last_commit_hash: None,
             last_commit_time: None,
             remote_url: None,
             pending_changes: 0,
@@ -93,18 +95,19 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
         })
         .or_else(|| Some("main".to_string())); // fallback
 
-    let (last_commit, last_commit_time) = repo
+    let (last_commit, last_commit_hash, last_commit_time) = repo
         .head()
         .ok()
         .and_then(|h| h.peel_to_commit().ok())
         .map(|c| {
             let msg = c.message().unwrap_or("").lines().next().unwrap_or("").to_string();
+            let hash = c.id().to_string()[..7].to_string(); // short hash (7 chars)
             let time = chrono::DateTime::from_timestamp(c.time().seconds(), 0)
                 .map(|dt: chrono::DateTime<chrono::Utc>| dt.format("%Y-%m-%d %H:%M").to_string())
                 .unwrap_or_default();
-            (Some(msg), Some(time))
+            (Some(msg), Some(hash), Some(time))
         })
-        .unwrap_or((None, None));
+        .unwrap_or((None, None, None));
 
     let remote_url = repo
         .find_remote("origin")
@@ -149,6 +152,7 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
         has_gitignore,
         branch,
         last_commit,
+        last_commit_hash,
         last_commit_time,
         remote_url,
         pending_changes,

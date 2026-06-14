@@ -331,25 +331,27 @@ function LocalTab() {
                 {status?.is_git_repo && (
                   <div className="mt-3 space-y-2">
                     {/* Latest commit — git log style */}
-                    <div className="flex items-start gap-2 text-xs">
-                      <GitBranch className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-xs">
+                      <GitBranch className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
+                      <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap">
                         {status.last_commit ? (
                           <>
-                            <p className="text-foreground/80 line-clamp-2 leading-relaxed font-mono">
+                            {status.last_commit_hash && (
+                              <span className="font-mono text-primary/70 bg-primary/10 px-1.5 py-0.5 rounded text-[10px] shrink-0">
+                                {status.last_commit_hash}
+                              </span>
+                            )}
+                            <span className="font-mono text-foreground/80 truncate">
                               {status.last_commit}
-                            </p>
-                            <p className="text-muted-foreground/60 mt-1">
-                              <span>{project.label}</span>
-                              <span> · </span>
-                              <span className="font-mono">{status.branch ?? "main"}</span>
-                              {status.last_commit_time && (
-                                <>
-                                  <span> · </span>
-                                  <span>{status.last_commit_time}</span>
-                                </>
-                              )}
-                            </p>
+                            </span>
+                            <span className="text-muted-foreground/40 shrink-0">·</span>
+                            <span className="font-mono text-muted-foreground/60 shrink-0">{status.branch ?? "main"}</span>
+                            {status.last_commit_time && (
+                              <>
+                                <span className="text-muted-foreground/40 shrink-0">·</span>
+                                <span className="text-muted-foreground/60 shrink-0">{status.last_commit_time}</span>
+                              </>
+                            )}
                           </>
                         ) : (
                           <p className="text-muted-foreground/50 italic">No commits yet</p>
@@ -359,11 +361,11 @@ function LocalTab() {
 
                     {/* Last push — same style, skip if message same as latest commit */}
                     {project.lastPushedAt && project.lastCommitMessage && (
-                      <div className="flex items-start gap-2 text-xs">
+                      <div className="flex items-center gap-2 text-xs">
                         {project.lastPushStatus === "success" ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-github-green mt-0.5 shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-github-green shrink-0" />
                         ) : (
-                          <AlertCircle className="w-3.5 h-3.5 text-github-red mt-0.5 shrink-0" />
+                          <AlertCircle className="w-3.5 h-3.5 text-github-red shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
                           {/* Only show message if different from latest git commit */}
@@ -372,7 +374,7 @@ function LocalTab() {
                               {project.lastCommitMessage}
                             </p>
                           )}
-                          <p className="text-muted-foreground/60 mt-1">
+                          <p className="text-muted-foreground/60">
                             <span className={project.lastPushStatus === "success" ? "text-github-green" : "text-github-red"}>
                               {project.lastPushStatus === "success" ? "pushed" : "failed"}
                             </span>
