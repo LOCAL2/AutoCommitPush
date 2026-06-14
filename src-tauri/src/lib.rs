@@ -51,6 +51,8 @@ pub fn run() {
             watcher::watch_project,
             watcher::unwatch_project,
             commands::terminal::run_terminal_command,
+            commands::terminal::check_docker_available,
+            commands::terminal::docker_push,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

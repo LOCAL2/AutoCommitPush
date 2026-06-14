@@ -127,3 +127,17 @@ export const runTerminalCommand = (cwd: string, input: string) =>
     "run_terminal_command",
     { cwd, input }
   );
+
+// ─── Docker (via Rust — no shell plugin permission needed) ────────────────────
+export const checkDockerAvailable = () =>
+  invoke<{ success: boolean; output: string }>("check_docker_available");
+
+export const dockerPush = (
+  projectPath: string,
+  username: string,
+  password: string,
+  imageName: string,
+  tag: string,
+) => invoke<{ success: boolean; output: string }>("docker_push", {
+  projectPath, username, password, imageName, tag,
+});
