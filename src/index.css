@@ -102,3 +102,48 @@
 .diff-line:hover {
   filter: brightness(1.05);
 }
+
+/* ── Markdown prose preview ─────────────────────────────────────────────── */
+.prose { color: hsl(var(--foreground)); line-height: 1.7; }
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em;
+  color: hsl(var(--foreground)); border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.3em;
+}
+.prose h1 { font-size: 1.875rem; }
+.prose h2 { font-size: 1.5rem; }
+.prose h3 { font-size: 1.25rem; }
+.prose h4 { font-size: 1.125rem; }
+.prose p { margin: 0.75em 0; }
+.prose a { color: hsl(var(--primary)); text-decoration: underline; }
+.prose a:hover { opacity: 0.8; }
+.prose strong { font-weight: 700; }
+.prose em { font-style: italic; }
+.prose del { text-decoration: line-through; opacity: 0.6; }
+.prose ul, .prose ol { padding-left: 1.5rem; margin: 0.75em 0; }
+.prose ul { list-style-type: disc; }
+.prose ol { list-style-type: decimal; }
+.prose li { margin: 0.25em 0; }
+.prose li input[type="checkbox"] { margin-right: 0.4em; accent-color: hsl(var(--primary)); }
+.prose blockquote {
+  border-left: 4px solid hsl(var(--primary)); padding-left: 1rem;
+  margin: 1em 0; color: hsl(var(--muted-foreground)); font-style: italic;
+}
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875em; padding: 0.2em 0.4em;
+  background: hsl(var(--secondary)); border-radius: 4px;
+}
+.prose pre {
+  background: hsl(var(--secondary)); border-radius: 8px;
+  padding: 1rem; overflow-x: auto; margin: 1em 0;
+  border: 1px solid hsl(var(--border));
+}
+.prose pre code { background: transparent; padding: 0; font-size: 0.85em; }
+.prose hr { border: none; border-top: 1px solid hsl(var(--border)); margin: 1.5em 0; }
+.prose img { max-width: 100%; border-radius: 6px; margin: 0.75em 0; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+.prose thead tr { border-bottom: 2px solid hsl(var(--border)); }
+.prose th { padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; }
+.prose td { padding: 0.5rem 0.75rem; border-bottom: 1px solid hsl(var(--border)); }
+.prose tbody tr:hover { background: hsl(var(--secondary) / 0.5); }

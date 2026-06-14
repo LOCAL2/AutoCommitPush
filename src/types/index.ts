@@ -34,6 +34,7 @@ export interface RepoStatus {
   pending_changes: number;
   untracked: string[];
   modified: string[];
+  deleted: string[];
   staged: string[];
 }
 

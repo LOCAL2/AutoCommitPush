@@ -93,3 +93,10 @@ export const getGitignoreTemplate = (template: string) =>
 
 export const cloneRepository = (url: string, path: string, token: string) =>
   invoke<string>("clone_repository", { url, path, token });
+
+// ─── README ──────────────────────────────────────────────────────────────────
+export const readReadme = (path: string) =>
+  invoke<string>("read_readme", { path });
+
+export const writeReadme = (path: string, content: string) =>
+  invoke<string>("write_readme", { path, content });

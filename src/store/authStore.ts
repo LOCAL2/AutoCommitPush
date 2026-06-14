@@ -18,6 +18,20 @@ function lsClear() {
   try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
 }
 
+// ─── Wait for Tauri IPC to be ready ──────────────────────────────────────────
+async function waitForTauri(retries = 20, delayMs = 100): Promise<boolean> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      // lightweight probe — just check if invoke is reachable
+      await cmd.hasToken();
+      return true;
+    } catch {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+  return false;
+}
+
 // ─── Store ───────────────────────────────────────────────────────────────────
 interface AuthState {
   token: string | null;
@@ -41,12 +55,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const user = await cmd.getUserInfo(token);
 
-      // Try keyring first, fall back to localStorage
+      // Save to keyring + localStorage as backup
       try {
         await cmd.saveToken(token);
-      } catch {
-        lsSave(token);
-      }
+      } catch { /* keyring unavailable */ }
+      lsSave(token);
 
       set({ token, user, isLoading: false });
     } catch (e) {
@@ -66,16 +79,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   restoreSession: async () => {
     // isLoading already true from initial state
     try {
-      // 1. Try secure keyring
+      // 1. Wait for Tauri IPC — on slow machines the webview may race ahead
+      const tauriReady = await waitForTauri();
+
       let token: string | null = null;
-      try {
-        const has = await cmd.hasToken();
-        if (has) token = await cmd.getToken();
-      } catch {
-        // keyring unavailable on this machine
+
+      if (tauriReady) {
+        // 2. Try secure keyring / store via Rust
+        try {
+          const has = await cmd.hasToken();
+          if (has) token = await cmd.getToken();
+        } catch {
+          // keyring/store unavailable
+        }
       }
 
-      // 2. Fall back to localStorage
+      // 3. Fall back to localStorage (always available)
       if (!token) token = lsGet();
 
       if (!token) {
@@ -83,15 +102,41 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      // 3. Validate token is still good
-      const user = await cmd.getUserInfo(token);
-
-      // 4. Re-save to keyring in case it was from localStorage
-      try { await cmd.saveToken(token); } catch { lsSave(token); }
+      // 4. Validate token with GitHub (skip if offline)
+      let user: GitHubUser | null = null;
+      try {
+        user = await cmd.getUserInfo(token);
+        // Re-persist everywhere so both stores stay in sync
+        try { await cmd.saveToken(token); } catch { /* ignore */ }
+        lsSave(token);
+      } catch {
+        // Network error or token expired
+        // If we can reach GitHub but token is bad → clear
+        // If we can't reach GitHub → keep token and let user proceed
+        try {
+          // Quick connectivity check via fetch
+          const online = await fetch("https://api.github.com", { method: "HEAD" })
+            .then(() => true)
+            .catch(() => false);
+          if (online) {
+            // Token is actually invalid — clear
+            throw new Error("invalid token");
+          } else {
+            // Offline — keep token but no user info
+            set({ token, user: null, isLoading: false });
+            return;
+          }
+        } catch {
+          try { await cmd.deleteToken(); } catch { /* ignore */ }
+          lsClear();
+          set({ token: null, user: null, isLoading: false });
+          return;
+        }
+      }
 
       set({ token, user, isLoading: false });
     } catch {
-      // Token expired or invalid — clear everything
+      // Token expired or network error — clear and go to login
       try { await cmd.deleteToken(); } catch { /* ignore */ }
       lsClear();
       set({ token: null, user: null, isLoading: false });

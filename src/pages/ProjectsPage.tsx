@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   FolderOpen, Plus, Trash2, Edit2, ExternalLink, Search,
   GitBranch, UploadCloud, AlertCircle, Check, X, RefreshCw,
-  Github, Lock, Unlock, Container, CheckCircle2,
+  Github, Lock, Unlock, Container, CheckCircle2, FileText,
 } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import DockerPushDialog from "@/components/DockerPushDialog";
 import PushConfirmDialog from "@/components/PushConfirmDialog";
 import RemoveProjectDialog from "@/components/RemoveProjectDialog";
 import ChangesDiffPanel from "@/components/ChangesDiffPanel";
+import ReadmeEditor from "@/components/ReadmeEditor";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -36,6 +37,7 @@ interface ProjectCardState {
   showCreateRepo: boolean;
   showDockerPush: boolean;
   showPushConfirm: boolean;
+  showReadme: boolean;
 }
 
 function defaultCardState(): ProjectCardState {
@@ -43,6 +45,7 @@ function defaultCardState(): ProjectCardState {
     status: null, loading: false, pushing: false,
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
+    showReadme: false,
   };
 }
 
@@ -314,56 +317,57 @@ function LocalTab() {
 
                 {/* Repo info */}
                 {status?.is_git_repo && (
-                  <div className="mt-3 space-y-1.5">
-                    {/* Branch + last commit message */}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <GitBranch className="h-3.5 w-3.5 shrink-0" />
-                      <span className="font-mono">{status.branch ?? "main"}</span>
-                      {!status.last_commit && (
-                        <span className="text-github-orange text-[10px]">(no commits)</span>
-                      )}
-                    </div>
-                    {/* Last commit text */}
-                    {status.last_commit ? (
-                      <div className="flex items-start gap-1.5 text-xs">
-                        <span className="text-muted-foreground shrink-0 mt-px">Commit:</span>
-                        <span className="font-mono text-foreground/80 truncate" title={status.last_commit}>
-                          {status.last_commit}
-                        </span>
-                        {status.last_commit_time && (
-                          <span className="text-muted-foreground/60 shrink-0 ml-auto">
-                            {status.last_commit_time}
-                          </span>
+                  <div className="mt-3 space-y-2">
+                    {/* Latest commit — git log style */}
+                    <div className="flex items-start gap-2 text-xs">
+                      <GitBranch className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        {status.last_commit ? (
+                          <>
+                            <p className="text-foreground/80 line-clamp-2 leading-relaxed font-mono">
+                              {status.last_commit}
+                            </p>
+                            <p className="text-muted-foreground/60 mt-1">
+                              <span>{project.label}</span>
+                              <span> · </span>
+                              <span className="font-mono">{status.branch ?? "main"}</span>
+                              {status.last_commit_time && (
+                                <>
+                                  <span> · </span>
+                                  <span>{status.last_commit_time}</span>
+                                </>
+                              )}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-muted-foreground/50 italic">No commits yet</p>
                         )}
                       </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground/50 italic">No commits yet</p>
-                    )}
-                    {/* Last push status */}
-                    {project.lastPushedAt && (
-                      <div className="flex items-center gap-1.5 text-xs">
+                    </div>
+
+                    {/* Last push — same style, skip if message same as latest commit */}
+                    {project.lastPushedAt && project.lastCommitMessage && (
+                      <div className="flex items-start gap-2 text-xs">
                         {project.lastPushStatus === "success" ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-github-green shrink-0" />
-                        ) : project.lastPushStatus === "error" ? (
-                          <AlertCircle className="h-3.5 w-3.5 text-github-red shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-github-green mt-0.5 shrink-0" />
                         ) : (
-                          <UploadCloud className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <AlertCircle className="w-3.5 h-3.5 text-github-red mt-0.5 shrink-0" />
                         )}
-                        <span className={
-                          project.lastPushStatus === "success"
-                            ? "text-github-green"
-                            : project.lastPushStatus === "error"
-                            ? "text-github-red"
-                            : "text-muted-foreground"
-                        }>
-                          {project.lastPushStatus === "success" ? "Pushed" : project.lastPushStatus === "error" ? "Push failed" : "Pushed"}
-                        </span>
-                        <span className="text-muted-foreground/60">{formatDate(project.lastPushedAt)}</span>
-                        {project.lastCommitMessage && (
-                          <span className="text-muted-foreground/50 truncate ml-1" title={project.lastCommitMessage}>
-                            · {project.lastCommitMessage}
-                          </span>
-                        )}
+                        <div className="flex-1 min-w-0">
+                          {/* Only show message if different from latest git commit */}
+                          {project.lastCommitMessage !== status?.last_commit && (
+                            <p className="text-foreground/80 line-clamp-2 leading-relaxed font-mono">
+                              {project.lastCommitMessage}
+                            </p>
+                          )}
+                          <p className="text-muted-foreground/60 mt-1">
+                            <span className={project.lastPushStatus === "success" ? "text-github-green" : "text-github-red"}>
+                              {project.lastPushStatus === "success" ? "pushed" : "failed"}
+                            </span>
+                            <span> · </span>
+                            <span>{formatDate(project.lastPushedAt)}</span>
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -413,7 +417,14 @@ function LocalTab() {
                     disabled={!status?.is_git_repo}
                     onClick={() => handlePush(project.id, project.path, project.label)}>
                     <UploadCloud className="h-4 w-4" /> Push
-                  </Button>                  <Button size="sm" variant="outline"
+                  </Button>
+                  <Button size="sm" variant="outline"
+                    title="Edit README.md"
+                    onClick={() => setCardState(project.id, { showReadme: true })}
+                    className="text-muted-foreground hover:text-foreground">
+                    <FileText className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="outline"
                     title="Push to Docker Hub"
                     onClick={() => setCardState(project.id, { showDockerPush: true })}
                     className="text-blue-400 hover:text-blue-300 border-blue-400/30 hover:border-blue-400">
@@ -465,6 +476,14 @@ function LocalTab() {
                   projectPath={project.path}
                   projectId={project.id}
                   onClose={() => setCardState(project.id, { showDockerPush: false })}
+                />
+              )}
+
+              {cs.showReadme && (
+                <ReadmeEditor
+                  projectPath={project.path}
+                  projectLabel={project.label}
+                  onClose={() => setCardState(project.id, { showReadme: false })}
                 />
               )}
             </Card>

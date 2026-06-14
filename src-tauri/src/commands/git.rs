@@ -18,6 +18,7 @@ pub struct RepoStatus {
     pub pending_changes: u32,
     pub untracked: Vec<String>,
     pub modified: Vec<String>,
+    pub deleted: Vec<String>,
     pub staged: Vec<String>,
 }
 
@@ -68,6 +69,7 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
             pending_changes: 0,
             untracked: vec![],
             modified: vec![],
+            deleted: vec![],
             staged: vec![],
         });
     }
@@ -116,6 +118,7 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
 
     let mut untracked = vec![];
     let mut modified = vec![];
+    let mut deleted = vec![];
     let mut staged = vec![];
 
     for entry in statuses.iter() {
@@ -125,8 +128,11 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
         if status.contains(git2::Status::WT_NEW) {
             untracked.push(path_str.clone());
         }
-        if status.contains(git2::Status::WT_MODIFIED) || status.contains(git2::Status::WT_DELETED) {
+        if status.contains(git2::Status::WT_MODIFIED) {
             modified.push(path_str.clone());
+        }
+        if status.contains(git2::Status::WT_DELETED) {
+            deleted.push(path_str.clone());
         }
         if status.contains(git2::Status::INDEX_NEW)
             || status.contains(git2::Status::INDEX_MODIFIED)
@@ -136,7 +142,7 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
         }
     }
 
-    let pending_changes = (untracked.len() + modified.len()) as u32;
+    let pending_changes = (untracked.len() + modified.len() + deleted.len()) as u32;
 
     Ok(RepoStatus {
         is_git_repo: true,
@@ -148,6 +154,7 @@ pub fn get_repo_status(path: String) -> Result<RepoStatus, String> {
         pending_changes,
         untracked,
         modified,
+        deleted,
         staged,
     })
 }

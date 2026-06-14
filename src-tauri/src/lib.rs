@@ -42,6 +42,8 @@ pub fn run() {
             commands::fs_ops::open_in_explorer,
             commands::fs_ops::path_exists,
             commands::fs_ops::get_gitignore_template,
+            commands::fs_ops::read_readme,
+            commands::fs_ops::write_readme,
             watcher::watch_project,
             watcher::unwatch_project,
         ])

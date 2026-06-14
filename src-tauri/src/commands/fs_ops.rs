@@ -20,6 +20,26 @@ pub fn write_gitignore(path: String, content: String) -> Result<String, String> 
 }
 
 #[command]
+pub fn read_readme(path: String) -> Result<String, String> {
+    let base = Path::new(&path);
+    // Try common casing variants
+    for name in &["README.md", "readme.md", "Readme.md"] {
+        let p = base.join(name);
+        if p.exists() {
+            return fs::read_to_string(p).map_err(|e| e.to_string());
+        }
+    }
+    Ok(String::new())
+}
+
+#[command]
+pub fn write_readme(path: String, content: String) -> Result<String, String> {
+    let readme_path = Path::new(&path).join("README.md");
+    fs::write(readme_path, content).map_err(|e| e.to_string())?;
+    Ok("Saved".to_string())
+}
+
+#[command]
 pub fn open_folder_dialog() -> Result<Option<String>, String> {
     Ok(None)
 }

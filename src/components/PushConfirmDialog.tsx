@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   X, UploadCloud, GitBranch, Globe,
   AlertCircle, Sparkles, ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { RepoStatus } from "@/types";
+import type { RepoStatus, FileDiff } from "@/types";
 import { useSettingsStore } from "@/store/settingsStore";
 import { generateCommitMessage, getCommitSuggestions } from "@/lib/commit-message";
 import ChangesDiffPanel from "@/components/ChangesDiffPanel";
@@ -26,18 +26,29 @@ export default function PushConfirmDialog({
   onCancel,
 }: Props) {
   const { defaultCommitMessage } = useSettingsStore();
+  const [diffCache, setDiffCache] = useState<Record<string, FileDiff>>({});
 
-  // Auto-generate on open
+  // Auto-generate on open (no diff yet — refines once diffs load)
   const [commitMsg, setCommitMsg] = useState(() => {
-    try {
-      return generateCommitMessage(status);
-    } catch {
-      return `${defaultCommitMessage} - ${new Date().toLocaleString()}`;
-    }
+    try { return generateCommitMessage(status); }
+    catch { return `${defaultCommitMessage} - ${new Date().toLocaleString()}`; }
   });
 
+  // When diffs finish loading, silently improve the message if user hasn't typed
+  const handleDiffCache = useCallback((cache: Record<string, FileDiff>) => {
+    setDiffCache(cache);
+    setCommitMsg((prev) => {
+      // Only auto-update if it still matches the original auto-generated value
+      const original = generateCommitMessage(status);
+      if (prev === original || prev === generateCommitMessage(status, cache)) {
+        return generateCommitMessage(status, cache);
+      }
+      return prev; // user edited manually — don't overwrite
+    });
+  }, [status]);
+
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const suggestions = getCommitSuggestions(status);
+  const suggestions = getCommitSuggestions(status, diffCache);
 
   const branch = status.branch ?? "main";
   const remote = status.remote_url ?? "(no remote)";
@@ -84,7 +95,11 @@ export default function PushConfirmDialog({
 
           {/* Changed files with diff */}
           {totalChanges > 0 && (
-            <ChangesDiffPanel projectPath={projectPath} status={status} />
+            <ChangesDiffPanel
+              projectPath={projectPath}
+              status={status}
+              onDiffCache={handleDiffCache}
+            />
           )}
 
           {totalChanges === 0 && (
@@ -99,9 +114,7 @@ export default function PushConfirmDialog({
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Commit Message</label>
               <button
-                onClick={() => {
-                  setCommitMsg(generateCommitMessage(status));
-                }}
+                onClick={() => setCommitMsg(generateCommitMessage(status, diffCache))}
                 className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
               >
                 <Sparkles className="h-3 w-3" />

@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use notify_debouncer_mini::{new_debouncer, DebounceEventResult};
-use notify::{RecursiveMode, Watcher};
+use notify::{RecursiveMode};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, State};
 
