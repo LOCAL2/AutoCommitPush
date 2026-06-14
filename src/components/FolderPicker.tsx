@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   X, ChevronRight, ChevronLeft, Folder, FolderOpen,
   HardDrive, Home, Check, Loader2, GitBranch,
+  Monitor, Download, FileText, Image, Music, Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import * as cmd from "@/lib/tauri-commands";
@@ -24,6 +25,12 @@ interface DriveEntry {
   path: string;
 }
 
+interface QuickEntry {
+  label: string;
+  icon: React.ReactNode;
+  path: string | null;
+}
+
 export default function FolderPicker({
   title = "Select Folder",
   confirmLabel = "Select",
@@ -31,6 +38,7 @@ export default function FolderPicker({
   onCancel,
 }: Props) {
   const [drives, setDrives] = useState<DriveEntry[]>([]);
+  const [quickDirs, setQuickDirs] = useState<QuickEntry[]>([]);
   const [currentPath, setCurrentPath] = useState<string>("");
   const [entries, setEntries] = useState<DirEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,12 +46,10 @@ export default function FolderPicker({
   const [history, setHistory] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Breadcrumbs ─────────────────────────────────────────────────────────────
   const breadcrumbs = currentPath
     ? currentPath.replace(/\\/g, "/").split("/").filter(Boolean)
     : [];
 
-  // ── Navigate to path ────────────────────────────────────────────────────────
   const navigateTo = useCallback(async (path: string, pushHistory = true) => {
     setLoading(true);
     setError(null);
@@ -54,7 +60,7 @@ export default function FolderPicker({
       }
       setCurrentPath(path);
       setEntries(dirs);
-      setSelected(path); // selecting a folder = the current folder itself
+      setSelected(path);
     } catch (e) {
       setError(String(e));
     } finally {
@@ -62,15 +68,30 @@ export default function FolderPicker({
     }
   }, [currentPath]);
 
-  // ── Initial load ─────────────────────────────────────────────────────────────
   useEffect(() => {
     const init = async () => {
-      const [drivesData, home] = await Promise.all([
+      const [drivesData, home, userDirs] = await Promise.all([
         cmd.getDrives().catch(() => [] as DriveEntry[]),
         cmd.getHomeDir().catch(() => null),
+        cmd.getUserDirs().catch(() => null),
       ]);
       setDrives(drivesData);
-      // Start at home dir or first drive
+
+      // Build fallback paths from home dir (e.g. C:\Users\Username)
+      const fallback = (sub: string) =>
+        home ? `${home}\\${sub}` : null;
+
+      const quick: QuickEntry[] = [
+        { label: "Home",      icon: <Home      className="h-3.5 w-3.5 shrink-0" />, path: home },
+        { label: "Desktop",   icon: <Monitor   className="h-3.5 w-3.5 shrink-0" />, path: userDirs?.desktop   ?? fallback("Desktop") },
+        { label: "Downloads", icon: <Download  className="h-3.5 w-3.5 shrink-0" />, path: userDirs?.downloads ?? fallback("Downloads") },
+        { label: "Documents", icon: <FileText  className="h-3.5 w-3.5 shrink-0" />, path: userDirs?.documents ?? fallback("Documents") },
+        { label: "Pictures",  icon: <Image     className="h-3.5 w-3.5 shrink-0" />, path: userDirs?.pictures  ?? fallback("Pictures") },
+        { label: "Music",     icon: <Music     className="h-3.5 w-3.5 shrink-0" />, path: userDirs?.music     ?? fallback("Music") },
+        { label: "Videos",    icon: <Video     className="h-3.5 w-3.5 shrink-0" />, path: userDirs?.videos    ?? fallback("Videos") },
+      ].filter((q) => q.path !== null);
+      setQuickDirs(quick);
+
       const start = home ?? drivesData[0]?.path ?? "C:\\";
       navigateTo(start, false);
     };
@@ -78,7 +99,6 @@ export default function FolderPicker({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Go back ──────────────────────────────────────────────────────────────────
   const goBack = () => {
     if (history.length === 0) return;
     const prev = history[history.length - 1];
@@ -86,7 +106,6 @@ export default function FolderPicker({
     navigateTo(prev, false);
   };
 
-  // ── Go up one level ──────────────────────────────────────────────────────────
   const goUp = () => {
     if (!currentPath) return;
     const parts = currentPath.replace(/\\/g, "/").split("/").filter(Boolean);
@@ -96,7 +115,6 @@ export default function FolderPicker({
     navigateTo(parent);
   };
 
-  // ── Navigate via breadcrumb ──────────────────────────────────────────────────
   const navBreadcrumb = (index: number) => {
     const parts = currentPath.replace(/\\/g, "/").split("/").filter(Boolean);
     const target = parts.slice(0, index + 1).join("\\") + (index === 0 ? "\\" : "");
@@ -105,41 +123,34 @@ export default function FolderPicker({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-xl rounded-xl border bg-card shadow-2xl animate-fade-in flex flex-col overflow-hidden"
-        style={{ height: "520px" }}>
-
-        {/* ── Header ── */}
+      <div
+        className="w-full max-w-xl rounded-xl border bg-card shadow-2xl animate-fade-in flex flex-col overflow-hidden"
+        style={{ height: "520px" }}
+      >
+        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
           <div className="flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-primary" />
             <span className="font-semibold text-sm">{title}</span>
           </div>
-          <button onClick={onCancel}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary">
+          <button
+            onClick={onCancel}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-secondary"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* ── Toolbar ── */}
+        {/* Toolbar */}
         <div className="flex items-center gap-1 px-3 py-2 border-b bg-secondary/20 shrink-0">
-          <button
-            onClick={goBack}
-            disabled={history.length === 0}
-            title="Back"
-            className="p-1.5 rounded hover:bg-secondary disabled:opacity-30 transition-colors"
-          >
+          <button onClick={goBack} disabled={history.length === 0} title="Back"
+            className="p-1.5 rounded hover:bg-secondary disabled:opacity-30 transition-colors">
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <button
-            onClick={goUp}
-            disabled={breadcrumbs.length <= 1}
-            title="Up"
-            className="p-1.5 rounded hover:bg-secondary disabled:opacity-30 transition-colors"
-          >
+          <button onClick={goUp} disabled={breadcrumbs.length <= 1} title="Up"
+            className="p-1.5 rounded hover:bg-secondary disabled:opacity-30 transition-colors">
             <ChevronRight className="h-4 w-4 rotate-[-90deg]" />
           </button>
-
-          {/* Breadcrumbs */}
           <div className="flex items-center gap-0.5 ml-1 overflow-x-auto flex-1 text-xs min-w-0">
             {breadcrumbs.map((crumb, i) => (
               <div key={i} className="flex items-center gap-0.5 shrink-0">
@@ -155,11 +166,27 @@ export default function FolderPicker({
           </div>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar — drives & shortcuts */}
+          {/* Sidebar */}
           <div className="w-36 shrink-0 border-r bg-secondary/10 overflow-y-auto py-2">
             <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              Quick Access
+            </p>
+            {quickDirs.map((q) => (
+              <button
+                key={q.label}
+                onClick={() => q.path && navigateTo(q.path)}
+                className={`flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-secondary transition-colors ${
+                  currentPath === q.path ? "text-primary bg-primary/10" : "text-muted-foreground"
+                }`}
+              >
+                {q.icon}
+                <span className="truncate">{q.label}</span>
+              </button>
+            ))}
+
+            <p className="px-3 py-1 mt-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
               Drives
             </p>
             {drives.map((d) => (
@@ -174,22 +201,9 @@ export default function FolderPicker({
                 <span className="font-mono">{d.name}</span>
               </button>
             ))}
-            <p className="px-3 py-1 mt-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-              Quick
-            </p>
-            <button
-              onClick={async () => {
-                const home = await cmd.getHomeDir();
-                if (home) navigateTo(home);
-              }}
-              className="flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-secondary transition-colors text-muted-foreground"
-            >
-              <Home className="h-3.5 w-3.5 shrink-0" />
-              Home
-            </button>
           </div>
 
-          {/* Main file list */}
+          {/* File list */}
           <div className="flex-1 overflow-y-auto">
             {loading && (
               <div className="flex items-center justify-center h-full">
@@ -214,15 +228,12 @@ export default function FolderPicker({
                   onClick={() => setSelected(entry.path)}
                   onDoubleClick={() => navigateTo(entry.path)}
                   className={`flex items-center gap-2.5 w-full px-4 py-2 text-sm text-left transition-colors ${
-                    isSelected
-                      ? "bg-primary/15 text-primary"
-                      : "hover:bg-secondary/60 text-foreground"
+                    isSelected ? "bg-primary/15 text-primary" : "hover:bg-secondary/60 text-foreground"
                   }`}
                 >
                   {isSelected
                     ? <FolderOpen className="h-4 w-4 shrink-0 text-primary" />
-                    : <Folder className="h-4 w-4 shrink-0 text-muted-foreground/70" />
-                  }
+                    : <Folder className="h-4 w-4 shrink-0 text-muted-foreground/70" />}
                   <span className="flex-1 truncate">{entry.name}</span>
                   {entry.is_git && (
                     <GitBranch className="h-3 w-3 shrink-0 text-github-green opacity-70" />
@@ -233,15 +244,13 @@ export default function FolderPicker({
           </div>
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         <div className="flex items-center justify-between gap-3 px-4 py-3 border-t bg-secondary/10 shrink-0">
           <p className="text-xs font-mono text-muted-foreground truncate flex-1 min-w-0">
             {selected || currentPath || "—"}
           </p>
           <div className="flex items-center gap-2 shrink-0">
-            <Button size="sm" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
+            <Button size="sm" variant="outline" onClick={onCancel}>Cancel</Button>
             <Button
               size="sm"
               variant="success"

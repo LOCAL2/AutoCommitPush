@@ -76,6 +76,29 @@ pub fn get_home_dir() -> Option<String> {
     dirs::home_dir().map(|p| p.to_string_lossy().to_string())
 }
 
+/// Get common user directories (Desktop, Downloads, Documents, etc.)
+#[derive(Debug, Serialize)]
+pub struct UserDirs {
+    pub desktop: Option<String>,
+    pub downloads: Option<String>,
+    pub documents: Option<String>,
+    pub pictures: Option<String>,
+    pub music: Option<String>,
+    pub videos: Option<String>,
+}
+
+#[command]
+pub fn get_user_dirs() -> UserDirs {
+    UserDirs {
+        desktop:   dirs::desktop_dir().map(|p| p.to_string_lossy().to_string()),
+        downloads: dirs::download_dir().map(|p| p.to_string_lossy().to_string()),
+        documents: dirs::document_dir().map(|p| p.to_string_lossy().to_string()),
+        pictures:  dirs::picture_dir().map(|p| p.to_string_lossy().to_string()),
+        music:     dirs::audio_dir().map(|p| p.to_string_lossy().to_string()),
+        videos:    dirs::video_dir().map(|p| p.to_string_lossy().to_string()),
+    }
+}
+
 #[command]
 pub fn read_gitignore(path: String) -> Result<String, String> {
     let gitignore_path = Path::new(&path).join(".gitignore");

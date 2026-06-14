@@ -115,7 +115,8 @@ export default function ChangesDiffPanel({ projectPath, status, onDiffCache }: P
         // Update in-place — React will re-render with new numbers, no blank flash
         setDiffCache((prev) => {
           const next = { ...prev, [filePath]: match };
-          onDiffCache?.(next);
+          // Use setTimeout to avoid setState-during-render warning
+          setTimeout(() => onDiffCache?.(next), 0);
           return next;
         });
       }

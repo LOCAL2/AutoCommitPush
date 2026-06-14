@@ -110,3 +110,13 @@ export const getDrives = () =>
 
 export const getHomeDir = () =>
   invoke<string | null>("get_home_dir");
+
+export const getUserDirs = () =>
+  invoke<{
+    desktop: string | null;
+    downloads: string | null;
+    documents: string | null;
+    pictures: string | null;
+    music: string | null;
+    videos: string | null;
+  }>("get_user_dirs");

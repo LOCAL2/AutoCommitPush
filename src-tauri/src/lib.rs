@@ -47,6 +47,7 @@ pub fn run() {
             commands::fs_ops::list_directories,
             commands::fs_ops::get_drives,
             commands::fs_ops::get_home_dir,
+            commands::fs_ops::get_user_dirs,
             watcher::watch_project,
             watcher::unwatch_project,
         ])
