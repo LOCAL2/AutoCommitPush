@@ -26,8 +26,8 @@ export const useSettingsStore = create<SettingsState>()(
       defaultPrivate: false,
       theme: "dark" as Theme,
       launchOnStartup: false,
-      authorName: "AutoCommitPush User",
-      authorEmail: "user@example.com",
+      authorName: "",
+      authorEmail: "",
       // Docker
       dockerUsername: "",
       dockerPassword: "",

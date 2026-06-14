@@ -23,6 +23,10 @@ pub fn run() {
             commands::git::push_to_remote,
             commands::git::pull_from_remote,
             commands::git::get_branches,
+            commands::git::create_branch,
+            commands::git::switch_branch,
+            commands::git::delete_branch,
+            commands::git::rename_branch,
             commands::git::set_remote,
             commands::git::get_file_changes,
             commands::git::get_file_diff,
@@ -32,6 +36,7 @@ pub fn run() {
             commands::github::get_user_repos,
             commands::github::check_repo_exists,
             commands::github::delete_github_repo,
+            commands::github::get_latest_commit,
             commands::auth::save_token,
             commands::auth::get_token,
             commands::auth::delete_token,
@@ -53,6 +58,8 @@ pub fn run() {
             commands::terminal::run_terminal_command,
             commands::terminal::check_docker_available,
             commands::terminal::docker_push,
+            commands::setup::run_setup_checks,
+            commands::setup::check_single,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

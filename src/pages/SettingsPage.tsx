@@ -76,19 +76,21 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center gap-3">
-              <img src={user.avatar_url} alt={user.login}
-                className="w-10 h-10 rounded-full ring-2 ring-border" />
-              <div>
-                <p className="font-medium text-sm">{user.name ?? user.login}</p>
-                <p className="text-xs text-muted-foreground">@{user.login}</p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <img src={user.avatar_url} alt={user.login}
+                  className="w-10 h-10 rounded-full ring-2 ring-border" />
+                <div>
+                  <p className="font-medium text-sm">{user.name ?? user.login}</p>
+                  <p className="text-xs text-muted-foreground">@{user.login}</p>
+                </div>
               </div>
+              <Button variant="outline" size="sm"
+                className="text-destructive hover:text-destructive shrink-0"
+                onClick={async () => { await logout(); showToast("info", "Logged out"); }}>
+                <LogOut className="h-4 w-4" /> Sign Out
+              </Button>
             </div>
-            <Button variant="outline" size="sm"
-              className="text-destructive hover:text-destructive"
-              onClick={async () => { await logout(); showToast("info", "Logged out"); }}>
-              <LogOut className="h-4 w-4" /> Sign Out
-            </Button>
           </CardContent>
         </Card>
       )}
@@ -103,7 +105,11 @@ export default function SettingsPage() {
               value={settings.authorName}
               onChange={(e) => { settings.setAuthorName(e.target.value); flashSaved(); }}
               placeholder="Your Name"
+              className={!settings.authorName ? "border-github-orange/50 focus:border-github-orange" : ""}
             />
+            {!settings.authorName && (
+              <p className="text-xs text-github-orange">Required — used as git commit author name</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Email</label>
@@ -112,7 +118,11 @@ export default function SettingsPage() {
               value={settings.authorEmail}
               onChange={(e) => { settings.setAuthorEmail(e.target.value); flashSaved(); }}
               placeholder="you@example.com"
+              className={!settings.authorEmail ? "border-github-orange/50 focus:border-github-orange" : ""}
             />
+            {!settings.authorEmail && (
+              <p className="text-xs text-github-orange">Required — used as git commit author email</p>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -661,7 +661,8 @@ pub fn pull_from_remote(path: String, token: String, branch: String) -> Result<S
 #[command]
 pub fn get_branches(path: String) -> Result<Vec<String>, String> {
     let repo = Repository::open(&path).map_err(|e| e.to_string())?;
-    let branches = repo.branches(None).map_err(|e| e.to_string())?;
+    // BranchType::Local — local branches only, excludes origin/main, origin/HEAD etc.
+    let branches = repo.branches(Some(git2::BranchType::Local)).map_err(|e| e.to_string())?;
 
     let mut branch_names = vec![];
     for branch in branches {
@@ -673,6 +674,76 @@ pub fn get_branches(path: String) -> Result<Vec<String>, String> {
     }
 
     Ok(branch_names)
+}
+
+#[command]
+pub fn create_branch(path: String, name: String) -> Result<String, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+    let head_commit = repo
+        .head()
+        .map_err(|e| e.to_string())?
+        .peel_to_commit()
+        .map_err(|e| e.to_string())?;
+    repo.branch(&name, &head_commit, false)
+        .map_err(|e| e.to_string())?;
+    Ok(format!("Created branch '{}'", name))
+}
+
+#[command]
+pub fn switch_branch(path: String, name: String) -> Result<String, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+    let ref_name = format!("refs/heads/{}", name);
+    let reference = repo
+        .find_reference(&ref_name)
+        .map_err(|_| format!("Branch '{}' not found", name))?;
+    let commit = reference.peel_to_commit().map_err(|e| e.to_string())?;
+    let tree = commit.tree().map_err(|e| e.to_string())?;
+    repo.checkout_tree(
+        tree.as_object(),
+        Some(git2::build::CheckoutBuilder::default().safe()),
+    )
+    .map_err(|e| e.to_string())?;
+    repo.set_head(&ref_name).map_err(|e| e.to_string())?;
+    Ok(format!("Switched to branch '{}'", name))
+}
+
+#[command]
+pub fn delete_branch(path: String, name: String) -> Result<String, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+
+    let current = repo
+        .head()
+        .ok()
+        .and_then(|h| h.shorthand().map(|s| s.to_string()))
+        .unwrap_or_default();
+
+    if current == name {
+        return Err(format!(
+            "Cannot delete '{}' — it is currently checked out. Switch to another branch first.",
+            name
+        ));
+    }
+
+    let mut branch = repo
+        .find_branch(&name, git2::BranchType::Local)
+        .map_err(|_| format!("Branch '{}' not found", name))?;
+
+    branch.delete().map_err(|e| e.to_string())?;
+    Ok(format!("Deleted branch '{}'", name))
+}
+
+#[command]
+pub fn rename_branch(path: String, old_name: String, new_name: String) -> Result<String, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+
+    let mut branch = repo
+        .find_branch(&old_name, git2::BranchType::Local)
+        .map_err(|_| format!("Branch '{}' not found", old_name))?;
+
+    // git2 rename: force=false means fail if new_name already exists
+    branch.rename(&new_name, false).map_err(|e| e.to_string())?;
+
+    Ok(format!("Renamed branch '{}' → '{}'", old_name, new_name))
 }
 
 #[command]

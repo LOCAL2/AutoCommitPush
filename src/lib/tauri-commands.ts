@@ -34,6 +34,11 @@ export const checkRepoExists = (token: string, owner: string, repo: string) =>
 export const deleteGithubRepo = (token: string, owner: string, repo: string) =>
   invoke<string>("delete_github_repo", { token, owner, repo });
 
+export const getLatestCommit = (token: string, fullName: string) =>
+  invoke<{ sha: string; message: string; author: string; date: string } | null>(
+    "get_latest_commit", { token, fullName }
+  );
+
 // ─── Git Ops ─────────────────────────────────────────────────────────────────
 export const initRepository = (path: string) =>
   invoke<string>("init_repository", { path });
@@ -71,6 +76,18 @@ export const pullFromRemote = (path: string, token: string, branch: string) =>
 
 export const getBranches = (path: string) =>
   invoke<string[]>("get_branches", { path });
+
+export const createBranch = (path: string, name: string) =>
+  invoke<string>("create_branch", { path, name });
+
+export const switchBranch = (path: string, name: string) =>
+  invoke<string>("switch_branch", { path, name });
+
+export const deleteBranch = (path: string, name: string) =>
+  invoke<string>("delete_branch", { path, name });
+
+export const renameBranch = (path: string, oldName: string, newName: string) =>
+  invoke<string>("rename_branch", { path, oldName, newName });
 
 export const setRemote = (path: string, url: string) =>
   invoke<string>("set_remote", { path, url });
@@ -141,3 +158,19 @@ export const dockerPush = (
 ) => invoke<{ success: boolean; output: string }>("docker_push", {
   projectPath, username, password, imageName, tag,
 });
+
+// ─── Setup Checks ─────────────────────────────────────────────────────────────
+export interface CheckResult {
+  id: string;
+  label: string;
+  status: "ok" | "warn" | "error" | "checking";
+  detail: string;
+  fix_url: string | null;
+}
+
+export const runSetupChecks = () =>
+  invoke<CheckResult[]>("run_setup_checks");
+
+export const checkSingle = (id: string) =>
+  invoke<CheckResult>("check_single", { id });
+

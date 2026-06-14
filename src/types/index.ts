@@ -68,6 +68,8 @@ export interface GitHubRepo {
   ssh_url: string;
   private: boolean;
   description: string | null;
+  pushed_at: string | null;
+  default_branch: string | null;
 }
 
 export interface CreateRepoParams {

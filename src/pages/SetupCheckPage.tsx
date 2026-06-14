@@ -20,7 +20,10 @@ const CHECK_ICONS: Record<string, React.ReactNode> = {
 };
 
 // ── Status styles ─────────────────────────────────────────────────────────────
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<
+  CheckResult["status"],
+  { icon: React.ReactNode; icon_sm?: React.ReactNode; bg: string; badge: string; label: string }
+> = {
   ok: {
     icon: <CheckCircle2 className="h-4 w-4 text-github-green" />,
     bg: "bg-github-green/5 border-github-green/20",

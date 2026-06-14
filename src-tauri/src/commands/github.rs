@@ -28,6 +28,8 @@ pub struct GitHubRepo {
     pub ssh_url: String,
     pub private: bool,
     pub description: Option<String>,
+    pub pushed_at: Option<String>,
+    pub default_branch: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -49,6 +51,8 @@ struct GHRepo {
     ssh_url: String,
     private: bool,
     description: Option<String>,
+    pushed_at: Option<String>,
+    default_branch: Option<String>,
 }
 
 #[command]
@@ -115,28 +119,48 @@ pub async fn create_github_repo(token: String, params: CreateRepoParams) -> Resu
         ssh_url: repo.ssh_url,
         private: repo.private,
         description: repo.description,
+        pushed_at: repo.pushed_at,
+        default_branch: repo.default_branch,
     })
 }
 
 #[command]
 pub async fn get_user_repos(token: String) -> Result<Vec<GitHubRepo>, String> {
     let client = reqwest::Client::new();
-    let response = client
-        .get("https://api.github.com/user/repos?per_page=100&sort=updated")
-        .header("Authorization", format!("token {}", token))
-        .header("User-Agent", "AutoCommitPush/1.0")
-        .header("Accept", "application/vnd.github.v3+json")
-        .send()
-        .await
-        .map_err(|e| e.to_string())?;
+    let mut all_repos: Vec<GHRepo> = Vec::new();
+    let mut page = 1u32;
 
-    if !response.status().is_success() {
-        return Err(format!("GitHub API error: {}", response.status()));
+    // Paginate through all pages (100 per page max)
+    loop {
+        let url = format!(
+            "https://api.github.com/user/repos?per_page=100&sort=updated&type=all&page={}",
+            page
+        );
+        let response = client
+            .get(&url)
+            .header("Authorization", format!("token {}", token))
+            .header("User-Agent", "AutoCommitPush/1.0")
+            .header("Accept", "application/vnd.github.v3+json")
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        if !response.status().is_success() {
+            return Err(format!("GitHub API error: {}", response.status()));
+        }
+
+        let repos: Vec<GHRepo> = response.json().await.map_err(|e| e.to_string())?;
+        let fetched = repos.len();
+        all_repos.extend(repos);
+
+        // If we got less than 100, we're on the last page
+        if fetched < 100 {
+            break;
+        }
+        page += 1;
     }
 
-    let repos: Vec<GHRepo> = response.json().await.map_err(|e| e.to_string())?;
-
-    Ok(repos
+    Ok(all_repos
         .into_iter()
         .map(|r| GitHubRepo {
             name: r.name,
@@ -146,6 +170,8 @@ pub async fn get_user_repos(token: String) -> Result<Vec<GitHubRepo>, String> {
             ssh_url: r.ssh_url,
             private: r.private,
             description: r.description,
+            pushed_at: r.pushed_at,
+            default_branch: r.default_branch,
         })
         .collect())
 }
@@ -180,4 +206,56 @@ pub async fn delete_github_repo(token: String, owner: String, repo: String) -> R
     } else {
         Err(format!("Failed to delete: {}", response.status()))
     }
+}
+
+#[derive(Debug, Serialize)]
+pub struct LatestCommit {
+    pub sha: String,
+    pub message: String,
+    pub author: String,
+    pub date: String,
+}
+
+#[derive(Deserialize)]
+struct GHCommitResponse {
+    sha: String,
+    commit: GHCommitDetail,
+}
+
+#[derive(Deserialize)]
+struct GHCommitDetail {
+    message: String,
+    author: GHCommitAuthor,
+}
+
+#[derive(Deserialize)]
+struct GHCommitAuthor {
+    name: String,
+    date: String,
+}
+
+#[command]
+pub async fn get_latest_commit(token: String, full_name: String) -> Result<Option<LatestCommit>, String> {
+    let client = reqwest::Client::new();
+    let url = format!("https://api.github.com/repos/{}/commits?per_page=1", full_name);
+    let response = client
+        .get(&url)
+        .header("Authorization", format!("token {}", token))
+        .header("User-Agent", "AutoCommitPush/1.0")
+        .header("Accept", "application/vnd.github.v3+json")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if !response.status().is_success() {
+        return Ok(None);
+    }
+
+    let commits: Vec<GHCommitResponse> = response.json().await.map_err(|e| e.to_string())?;
+    Ok(commits.into_iter().next().map(|c| LatestCommit {
+        sha: c.sha[..7.min(c.sha.len())].to_string(),
+        message: c.commit.message.lines().next().unwrap_or("").to_string(),
+        author: c.commit.author.name,
+        date: c.commit.author.date,
+    }))
 }

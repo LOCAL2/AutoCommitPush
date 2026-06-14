@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   FolderOpen, Plus, Trash2, Search,
   GitBranch, UploadCloud, AlertCircle, Check, X, RefreshCw,
-  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare,
+  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare, GitPullRequest,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,8 @@ import ChangesDiffPanel from "@/components/ChangesDiffPanel";
 import ReadmeEditor from "@/components/ReadmeEditor";
 import FolderPicker from "@/components/FolderPicker";
 import TerminalDialog from "@/components/TerminalDialog";
+import BranchManagerDialog from "@/components/BranchManagerDialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -32,22 +34,25 @@ interface ProjectCardState {
   status: RepoStatus | null;
   loading: boolean;
   pushing: boolean;
+  pulling: boolean;
   pushProgress: number;
   editingLabel: boolean;
   tempLabel: string;
   showCreateRepo: boolean;
   showDockerPush: boolean;
   showPushConfirm: boolean;
+  showPullConfirm: boolean;
   showReadme: boolean;
   showTerminal: boolean;
+  showBranch: boolean;
 }
 
 function defaultCardState(): ProjectCardState {
   return {
-    status: null, loading: false, pushing: false,
+    status: null, loading: false, pushing: false, pulling: false,
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
-    showReadme: false, showTerminal: false,
+    showPullConfirm: false, showReadme: false, showTerminal: false, showBranch: false,
   };
 }
 
@@ -57,13 +62,19 @@ type Tab = "local" | "github";
 export default function ProjectsPage() {
   const [tab, setTab] = useState<Tab>("local");
   const { user } = useAuthStore();
+  const { token } = useAuthStore();
+  const [repoCount, setRepoCount] = useState<number | null>(null);
 
-  // Use public_repos from already-loaded user profile — no extra API call
-  const repoCount = user?.public_repos ?? null;
+  // Load actual repo count from API (includes private repos)
+  useEffect(() => {
+    if (!token) return;
+    cmd.getUserRepos(token)
+      .then((repos) => setRepoCount(repos.length))
+      .catch(() => setRepoCount(user?.public_repos ?? null));
+  }, [token, user]);
 
   return (
-    <div className="flex flex-col h-full animate-fade-in">
-      {/* Tab bar */}
+    <div className="flex flex-col h-full animate-fade-in">      {/* Tab bar */}
       <div className="flex items-center gap-1 px-6 pt-5 pb-0 border-b">
         <TabButton active={tab === "local"} onClick={() => setTab("local")}>
           <FolderOpen className="h-4 w-4" /> Local Projects
@@ -203,8 +214,37 @@ function LocalTab() {
     if (!token) { showToast("error", "Not logged in"); return; }
     const cs = cardStates[id];
     if (!cs?.status?.is_git_repo) { showToast("warning", "Not a git repo"); return; }
-    // Open the confirmation dialog — actual push happens in doPush
+    const { authorName, authorEmail } = useSettingsStore.getState();
+    if (!authorName.trim() || !authorEmail.trim()) {
+      showToast("error", "Git Author name and email are required. Please fill them in Settings first.");
+      return;
+    }
     setCardState(id, { showPushConfirm: true });
+  };
+
+  const handlePull = (id: string, _path: string, _label: string) => {
+    if (!token) { showToast("error", "Not logged in"); return; }
+    const cs = cardStates[id];
+    if (!cs?.status?.is_git_repo) { showToast("warning", "Not a git repo"); return; }
+    if (!cs?.status?.remote_url) { showToast("warning", "No remote configured"); return; }
+    setCardState(id, { showPullConfirm: true });
+  };
+
+  const doPull = async (id: string, path: string, label: string) => {
+    setCardState(id, { showPullConfirm: false, pulling: true });
+    addLog("info", "Pulling from remote...", id, label);
+    const branch = cardStates[id]?.status?.branch ?? "main";
+    try {
+      const result = await cmd.pullFromRemote(path, token!, branch);
+      addLog("success", `Pull: ${result}`, id, label);
+      showToast("success", result);
+      await loadStatus(id, path);
+    } catch (e) {
+      addLog("error", `Pull failed: ${e}`, id, label);
+      showToast("error", `Pull failed: ${e}`);
+    } finally {
+      setCardState(id, { pulling: false });
+    }
   };
 
   // Step 2: called after user confirms in dialog
@@ -428,9 +468,25 @@ function LocalTab() {
                 <div className="mt-3 flex items-center gap-2">
                   <Button size="sm" variant="success" className="flex-1"
                     loading={cs.pushing}
-                    disabled={!status?.is_git_repo}
+                    disabled={!status?.is_git_repo || cs.pulling}
                     onClick={() => handlePush(project.id, project.path, project.label)}>
                     <UploadCloud className="h-4 w-4" /> Push
+                  </Button>
+                  <Button size="sm" variant="outline"
+                    title="Manage branches"
+                    disabled={!status?.is_git_repo}
+                    onClick={() => setCardState(project.id, { showBranch: true })}
+                    className="text-muted-foreground hover:text-foreground font-mono text-xs gap-1">
+                    <GitBranch className="h-4 w-4" />
+                    {status?.branch ?? "main"}
+                  </Button>
+                  <Button size="sm" variant="outline"
+                    title="Pull from remote"
+                    loading={cs.pulling}
+                    disabled={!status?.is_git_repo || !status?.remote_url || cs.pushing}
+                    onClick={() => handlePull(project.id, project.path, project.label)}
+                    className="text-github-blue hover:text-github-blue border-github-blue/30 hover:border-github-blue">
+                    <GitPullRequest className="h-4 w-4" />
                   </Button>
                   <Button size="sm" variant="outline"
                     title="Edit README.md"
@@ -510,6 +566,26 @@ function LocalTab() {
                   onClose={() => setCardState(project.id, { showTerminal: false })}
                 />
               )}
+
+              {cs.showBranch && cs.status && (
+                <BranchManagerDialog
+                  projectLabel={project.label}
+                  projectPath={project.path}
+                  currentBranch={cs.status.branch ?? "main"}
+                  onBranchSwitch={() => loadStatus(project.id, project.path)}
+                  onClose={() => setCardState(project.id, { showBranch: false })}
+                />
+              )}
+
+              {cs.showPullConfirm && (
+                <ConfirmDialog
+                  title="Pull from Remote"
+                  message={`Pull latest changes from remote into "${project.label}" (${cs.status?.branch ?? "main"})?`}
+                  confirmLabel="Pull"
+                  onConfirm={() => doPull(project.id, project.path, project.label)}
+                  onCancel={() => setCardState(project.id, { showPullConfirm: false })}
+                />
+              )}
             </Card>
           );
         })}
@@ -543,6 +619,8 @@ function LocalTab() {
 // ─── GitHub Repos Tab ─────────────────────────────────────────────────────────
 type SortKey = "updated" | "name" | "stars";
 
+
+
 function GitHubTab() {
   const { token, user } = useAuthStore();
   const { addProject } = useProjectStore();
@@ -552,9 +630,11 @@ function GitHubTab() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "public" | "private">("all");
   const [sort, setSort] = useState<SortKey>("updated");
-  void setSort; // reserved for future sort UI
+  void setSort;
   const [cloning, setCloning] = useState<string | null>(null);
   const [cloneTarget, setCloneTarget] = useState<{ repo: GitHubRepo } | null>(null);
+  // Cache: full_name → { sha, message, author, date } | null
+  const [commitCache, setCommitCache] = useState<Record<string, { sha: string; message: string; author: string; date: string } | null>>({});
 
   const loadRepos = useCallback(async () => {
     if (!token) return;
@@ -562,6 +642,13 @@ function GitHubTab() {
     try {
       const data = await cmd.getUserRepos(token);
       setRepos(data);
+      // Lazy-load commits for all repos in background (batched)
+      setCommitCache({});
+      for (const repo of data) {
+        cmd.getLatestCommit(token, repo.full_name)
+          .then((c) => setCommitCache((prev) => ({ ...prev, [repo.full_name]: c ?? null })))
+          .catch(() => {});
+      }
     } catch (e) {
       showToast("error", `Failed to load repos: ${e}`);
     } finally {
@@ -697,8 +784,23 @@ function GitHubTab() {
                       </p>
                     )}
 
+                    {/* Latest commit */}
+                    {commitCache[repo.full_name] ? (
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        <GitBranch className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
+                        <span className="font-mono text-primary/70 bg-primary/10 px-1.5 py-0.5 rounded text-[10px] shrink-0">
+                          {commitCache[repo.full_name]!.sha}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground/80 truncate font-mono flex-1 min-w-0">
+                          {commitCache[repo.full_name]!.message}
+                        </span>
+                      </div>
+                    ) : commitCache[repo.full_name] === null ? null : (
+                      <p className="text-[11px] text-muted-foreground/40 mt-1 font-mono">loading commit...</p>
+                    )}
+
                     {/* Clone URL */}
-                    <p className="text-[11px] font-mono text-muted-foreground/60 mt-1 truncate">
+                    <p className="text-[11px] font-mono text-muted-foreground/40 mt-0.5 truncate">
                       {repo.clone_url}
                     </p>
                   </div>
