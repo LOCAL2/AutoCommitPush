@@ -165,6 +165,9 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <Container className="h-4 w-4" /> Docker Hub
+            <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-github-orange/15 text-github-orange border border-github-orange/30">
+              BETA
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">

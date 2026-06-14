@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   FolderOpen, Plus, Trash2, Search,
   GitBranch, UploadCloud, AlertCircle, Check, X, RefreshCw,
-  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare, GitPullRequest,
+  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare, GitPullRequest, FileCode, MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import FolderPicker from "@/components/FolderPicker";
 import TerminalDialog from "@/components/TerminalDialog";
 import BranchManagerDialog from "@/components/BranchManagerDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import GitignoreEditor from "@/components/GitignoreEditor";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -45,6 +46,8 @@ interface ProjectCardState {
   showReadme: boolean;
   showTerminal: boolean;
   showBranch: boolean;
+  showGitignore: boolean;
+  showMore: boolean;
 }
 
 function defaultCardState(): ProjectCardState {
@@ -52,7 +55,8 @@ function defaultCardState(): ProjectCardState {
     status: null, loading: false, pushing: false, pulling: false,
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
-    showPullConfirm: false, showReadme: false, showTerminal: false, showBranch: false,
+    showPullConfirm: false, showReadme: false, showTerminal: false,
+    showBranch: false, showGitignore: false, showMore: false,
   };
 }
 
@@ -488,27 +492,54 @@ function LocalTab() {
                     className="text-github-blue hover:text-github-blue border-github-blue/30 hover:border-github-blue">
                     <GitPullRequest className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="outline"
-                    title="Edit README.md"
-                    onClick={() => setCardState(project.id, { showReadme: true })}
-                    className="text-muted-foreground hover:text-foreground">
-                    <FileText className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="outline"
-                    title="Push to Docker Hub"
-                    onClick={() => setCardState(project.id, { showDockerPush: true })}
-                    className="text-blue-400 hover:text-blue-300 border-blue-400/30 hover:border-blue-400">
-                    <Container className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="outline"
-                    title="Open Terminal"
-                    onClick={() => setCardState(project.id, { showTerminal: true })}
-                    className="text-muted-foreground hover:text-foreground">
-                    <TerminalSquare className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => cmd.openInExplorer(project.path)}>
-                    <FolderOpen className="h-4 w-4" />
-                  </Button>
+
+                  {/* ── More dropdown ── */}
+                  <div className="relative">
+                    <Button size="sm" variant="outline"
+                      title="More actions"
+                      onClick={() => setCardState(project.id, { showMore: !cs.showMore })}
+                      className="text-muted-foreground hover:text-foreground">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                    {cs.showMore && (
+                      <>
+                        {/* Backdrop */}
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setCardState(project.id, { showMore: false })}
+                        />
+                        <div className="absolute left-0 top-full mt-1 z-20 w-44 rounded-md border bg-popover shadow-md py-1 animate-fade-in">
+                          <button
+                            onClick={() => { setCardState(project.id, { showMore: false, showReadme: true }); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground">
+                            <FileText className="h-3.5 w-3.5 text-muted-foreground" /> Edit README.md
+                          </button>
+                          <button
+                            onClick={() => { setCardState(project.id, { showMore: false, showGitignore: true }); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground">
+                            <FileCode className="h-3.5 w-3.5 text-muted-foreground" /> Edit .gitignore
+                          </button>
+                          <button
+                            onClick={() => { setCardState(project.id, { showMore: false, showTerminal: true }); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground">
+                            <TerminalSquare className="h-3.5 w-3.5 text-muted-foreground" /> Open Terminal
+                          </button>
+                          <button
+                            onClick={() => { setCardState(project.id, { showMore: false }); cmd.openInExplorer(project.path); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground">
+                            <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" /> Open in Explorer
+                          </button>
+                          <div className="border-t my-1" />
+                          <button
+                            onClick={() => { setCardState(project.id, { showMore: false, showDockerPush: true }); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-blue-400">
+                            <Container className="h-3.5 w-3.5" /> Push to Docker Hub
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
                   <Button size="sm" variant="outline" onClick={() => loadStatus(project.id, project.path)}>
                     <RefreshCw className="h-4 w-4" />
                   </Button>
@@ -556,6 +587,14 @@ function LocalTab() {
                   projectPath={project.path}
                   projectLabel={project.label}
                   onClose={() => setCardState(project.id, { showReadme: false })}
+                />
+              )}
+
+              {cs.showGitignore && (
+                <GitignoreEditor
+                  projectLabel={project.label}
+                  projectPath={project.path}
+                  onClose={() => setCardState(project.id, { showGitignore: false })}
                 />
               )}
 

@@ -89,6 +89,9 @@ export default function DockerPushDialog({ projectLabel, projectPath, projectId,
           <div className="flex items-center gap-2">
             <Container className="h-5 w-5 text-blue-400" />
             <h2 className="font-semibold">Push to Docker Hub</h2>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-github-orange/15 text-github-orange border border-github-orange/30">
+              BETA
+            </span>
           </div>
           <button onClick={onClose} disabled={loading}
             className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40">
