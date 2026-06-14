@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  FolderOpen, Plus, Trash2, Edit2, ExternalLink, Search,
+  FolderOpen, Plus, Trash2, Search,
   GitBranch, UploadCloud, AlertCircle, Check, X, RefreshCw,
-  Github, Lock, Unlock, Container, CheckCircle2, FileText,
+  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare,
 } from "lucide-react";
-import { open } from "@tauri-apps/plugin-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +24,7 @@ import RemoveProjectDialog from "@/components/RemoveProjectDialog";
 import ChangesDiffPanel from "@/components/ChangesDiffPanel";
 import ReadmeEditor from "@/components/ReadmeEditor";
 import FolderPicker from "@/components/FolderPicker";
+import TerminalDialog from "@/components/TerminalDialog";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -39,6 +39,7 @@ interface ProjectCardState {
   showDockerPush: boolean;
   showPushConfirm: boolean;
   showReadme: boolean;
+  showTerminal: boolean;
 }
 
 function defaultCardState(): ProjectCardState {
@@ -46,7 +47,7 @@ function defaultCardState(): ProjectCardState {
     status: null, loading: false, pushing: false,
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
-    showReadme: false,
+    showReadme: false, showTerminal: false,
   };
 }
 
@@ -55,6 +56,10 @@ type Tab = "local" | "github";
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ProjectsPage() {
   const [tab, setTab] = useState<Tab>("local");
+  const { user } = useAuthStore();
+
+  // Use public_repos from already-loaded user profile — no extra API call
+  const repoCount = user?.public_repos ?? null;
 
   return (
     <div className="flex flex-col h-full animate-fade-in">
@@ -64,7 +69,13 @@ export default function ProjectsPage() {
           <FolderOpen className="h-4 w-4" /> Local Projects
         </TabButton>
         <TabButton active={tab === "github"} onClick={() => setTab("github")}>
-          <Github className="h-4 w-4" /> My GitHub Repos
+          <Github className="h-4 w-4" />
+          My GitHub Repos
+          {repoCount !== null && (
+            <span className="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-secondary text-muted-foreground">
+              {repoCount}
+            </span>
+          )}
         </TabButton>
       </div>
 
@@ -102,6 +113,7 @@ function LocalTab() {
   const { showToast } = useToast();
   const [search, setSearch] = useState("");
   const [cardStates, setCardStates] = useState<Record<string, ProjectCardState>>({});
+  const [showAddPicker, setShowAddPicker] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<{
     id: string;
     label: string;
@@ -144,10 +156,9 @@ function LocalTab() {
     });
   }, [projects, cardStates, loadStatus]);
 
-  const handleAddProject = async () => {
-    const selected = await open({ directory: true, multiple: false });
-    if (!selected || Array.isArray(selected)) return;
-    const project = addProject(selected as string);
+  const handleAddProject = async (selectedPath: string) => {
+    setShowAddPicker(false);
+    const project = addProject(selectedPath);
     await loadStatus(project.id, project.path);
     addLog("info", `Added project: ${project.label}`, project.id, project.label);
     showToast("success", `Added: ${project.label}`);
@@ -234,7 +245,7 @@ function LocalTab() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{projects.length} project(s)</p>
-        <Button onClick={handleAddProject} size="sm">
+        <Button onClick={() => setShowAddPicker(true)} size="sm">
           <Plus className="h-4 w-4" /> Add Project
         </Button>
       </div>
@@ -432,11 +443,13 @@ function LocalTab() {
                     <Container className="h-4 w-4" />
                   </Button>
                   <Button size="sm" variant="outline"
-                    onClick={() => setCardState(project.id, { editingLabel: true, tempLabel: project.label })}>
-                    <Edit2 className="h-4 w-4" />
+                    title="Open Terminal"
+                    onClick={() => setCardState(project.id, { showTerminal: true })}
+                    className="text-muted-foreground hover:text-foreground">
+                    <TerminalSquare className="h-4 w-4" />
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => cmd.openInExplorer(project.path)}>
-                    <ExternalLink className="h-4 w-4" />
+                    <FolderOpen className="h-4 w-4" />
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => loadStatus(project.id, project.path)}>
                     <RefreshCw className="h-4 w-4" />
@@ -487,6 +500,14 @@ function LocalTab() {
                   onClose={() => setCardState(project.id, { showReadme: false })}
                 />
               )}
+
+              {cs.showTerminal && (
+                <TerminalDialog
+                  projectLabel={project.label}
+                  projectPath={project.path}
+                  onClose={() => setCardState(project.id, { showTerminal: false })}
+                />
+              )}
             </Card>
           );
         })}
@@ -501,6 +522,16 @@ function LocalTab() {
         githubOwner={user?.login ?? null}
         onConfirm={(deleteGitHub) => doRemove(confirmRemove.id, confirmRemove.label, deleteGitHub)}
         onCancel={() => setConfirmRemove(null)}
+      />
+    )}
+
+    {/* ── Add Project Folder Picker ── */}
+    {showAddPicker && (
+      <FolderPicker
+        title="Select Project Folder"
+        confirmLabel="Add Project"
+        onSelect={handleAddProject}
+        onCancel={() => setShowAddPicker(false)}
       />
     )}
   </>
@@ -586,7 +617,7 @@ function GitHubTab() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
-            {user?.login} · {repos.length} repositories
+            {user?.login}
           </p>
         </div>
         <Button size="sm" variant="outline" onClick={loadRepos} loading={loading}>

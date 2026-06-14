@@ -50,6 +50,7 @@ pub fn run() {
             commands::fs_ops::get_user_dirs,
             watcher::watch_project,
             watcher::unwatch_project,
+            commands::terminal::run_terminal_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

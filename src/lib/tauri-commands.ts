@@ -120,3 +120,10 @@ export const getUserDirs = () =>
     music: string | null;
     videos: string | null;
   }>("get_user_dirs");
+
+// ─── Terminal ─────────────────────────────────────────────────────────────────
+export const runTerminalCommand = (cwd: string, input: string) =>
+  invoke<{ stdout: string; stderr: string; exit_code: number }>(
+    "run_terminal_command",
+    { cwd, input }
+  );
