@@ -114,6 +114,10 @@ export default function ReadmeEditor({ projectPath, projectLabel, onClose }: Pro
   const [preview, setPreview] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // split ratio: 0–1, default 50/50
+  const [splitRatio, setSplitRatio] = useState(0.5);
+  const isDragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { showToast } = useToast();
 
@@ -200,6 +204,33 @@ export default function ReadmeEditor({ projectPath, projectLabel, onClose }: Pro
     });
   };
 
+  // ── Resizer drag ──────────────────────────────────────────────────────────
+  const handleResizerMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isDragging.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const ratio = (ev.clientX - rect.left) / rect.width;
+      // clamp between 20% and 80%
+      setSplitRatio(Math.min(0.8, Math.max(0.2, ratio)));
+    };
+
+    const onMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }, []);
+
   // ── Rendered HTML ──────────────────────────────────────────────────────────
   const renderedHtml = content
     ? (marked.parse(content) as string)
@@ -264,9 +295,12 @@ export default function ReadmeEditor({ projectPath, projectLabel, onClose }: Pro
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className={`flex-1 flex overflow-hidden ${preview ? "divide-x" : ""}`}>
+        <div ref={containerRef} className={`flex-1 flex overflow-hidden ${preview ? "divide-x" : ""}`}>
           {/* Editor pane */}
-          <div className={`flex flex-col ${preview ? "w-1/2" : "w-full"}`}>
+          <div
+            className="flex flex-col overflow-hidden"
+            style={{ width: preview ? `${splitRatio * 100}%` : "100%" }}
+          >
             <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-secondary/20 border-b">
               Editor
             </div>
@@ -280,9 +314,21 @@ export default function ReadmeEditor({ projectPath, projectLabel, onClose }: Pro
             />
           </div>
 
+          {/* Drag resizer */}
+          {preview && (
+            <div
+              onMouseDown={handleResizerMouseDown}
+              className="w-1 shrink-0 cursor-col-resize bg-border hover:bg-primary/60 transition-colors active:bg-primary"
+              title="Drag to resize"
+            />
+          )}
+
           {/* Preview pane */}
           {preview && (
-            <div className="w-1/2 flex flex-col overflow-hidden">
+            <div
+              className="flex flex-col overflow-hidden"
+              style={{ width: `${(1 - splitRatio) * 100}%` }}
+            >
               <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-secondary/20 border-b">
                 Preview
               </div>
