@@ -777,3 +777,37 @@ pub fn clone_repository(url: String, path: String, token: String) -> Result<Stri
 
     Ok(format!("Cloned to {}", path))
 }
+
+#[command]
+pub fn force_push_to_remote(path: String, token: String, branch: String) -> Result<String, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+
+    // ── Resolve actual branch name ────────────────────────────────────────────
+    let actual_branch = if let Ok(head) = repo.head() {
+        head.shorthand().unwrap_or(&branch).to_string()
+    } else {
+        return Err(
+            "Repository has no commits yet. Please make at least one commit before pushing."
+                .to_string(),
+        );
+    };
+
+    let mut remote = repo.find_remote("origin").map_err(|e| e.to_string())?;
+
+    let mut callbacks = RemoteCallbacks::new();
+    let token_clone = token.clone();
+    callbacks.credentials(move |_url, _username, _allowed| {
+        Cred::userpass_plaintext(&token_clone, "")
+    });
+
+    let mut push_opts = PushOptions::new();
+    push_opts.remote_callbacks(callbacks);
+
+    // Note the '+' indicating a force push
+    let refspec = format!("+refs/heads/{}:refs/heads/{}", actual_branch, actual_branch);
+    remote
+        .push(&[&refspec], Some(&mut push_opts))
+        .map_err(|e| e.to_string())?;
+
+    Ok(format!("Force push successful → {}", actual_branch))
+}

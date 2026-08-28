@@ -71,6 +71,9 @@ export const createCommit = (
 export const pushToRemote = (path: string, token: string, branch: string) =>
   invoke<string>("push_to_remote", { path, token, branch });
 
+export const forcePushToRemote = (path: string, token: string, branch: string) =>
+  invoke<string>("force_push_to_remote", { path, token, branch });
+
 export const pullFromRemote = (path: string, token: string, branch: string) =>
   invoke<string>("pull_from_remote", { path, token, branch });
 

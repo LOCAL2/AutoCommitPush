@@ -223,13 +223,19 @@ export default function LoginPage() {
 
           <div className="mt-4 pt-4 border-t space-y-3">
             {/* Generate token button */}
-            <button
+            <Button
+              variant="outline"
               onClick={handleOpenTokenPage}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+              className="w-full flex items-center justify-between group border-dashed hover:border-solid hover:bg-primary/5 transition-all duration-300"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
-              Generate a new token on GitHub ({selectedScopes.size} scopes selected)
-            </button>
+              <div className="flex items-center gap-2 text-sm text-foreground group-hover:text-primary transition-colors">
+                <Github className="h-4 w-4" />
+                Generate a new token on GitHub
+              </div>
+              <div className="flex items-center gap-2">
+                <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </Button>
 
             {/* Scope selector toggle */}
             <button
@@ -309,7 +315,7 @@ export default function LoginPage() {
         {/* Security note */}
         <div className="mt-4 rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
           <p className="text-foreground font-medium mb-1">Security</p>
-          <p>Your token is stored in the system keychain — never as plain text.</p>
+          <p>Your token is stored in the system keychain</p>
         </div>
       </div>
     </div>

@@ -48,6 +48,7 @@ interface ProjectCardState {
   showBranch: boolean;
   showGitignore: boolean;
   showMore: boolean;
+  hasConflict: boolean;
 }
 
 function defaultCardState(): ProjectCardState {
@@ -56,7 +57,7 @@ function defaultCardState(): ProjectCardState {
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
     showPullConfirm: false, showReadme: false, showTerminal: false,
-    showBranch: false, showGitignore: false, showMore: false,
+    showBranch: false, showGitignore: false, showMore: false, hasConflict: false,
   };
 }
 
@@ -266,7 +267,7 @@ function LocalTab() {
       await cmd.createCommit(path, commitMsg, authorName, authorEmail);
       setCardState(id, { pushProgress: 70 });
       await cmd.pushToRemote(path, token!, branch);
-      setCardState(id, { pushProgress: 100 });
+      setCardState(id, { pushProgress: 100, hasConflict: false });
       updateProject(id, {
         lastPushedAt: new Date().toISOString(),
         lastPushStatus: "success",
@@ -275,10 +276,43 @@ function LocalTab() {
       addLog("success", `Push successful → ${branch}`, id, label);
       showToast("success", "Pushed successfully!");
       await loadStatus(id, path);
-    } catch (e) {
+    } catch (e: any) {
       updateProject(id, { lastPushStatus: "error" });
       addLog("error", `Push failed: ${e}`, id, label);
-      showToast("error", `Push failed: ${e}`);
+      
+      const errStr = String(e);
+      if (errStr.includes("automatic merge produced conflicts")) {
+        setCardState(id, { hasConflict: true });
+        showToast("error", "Git Conflict: Please resolve or Force Push!");
+      } else {
+        showToast("error", `Push failed: ${e}`);
+      }
+    } finally {
+      setTimeout(() => setCardState(id, { pushing: false, pushProgress: 0 }), 1000);
+    }
+  };
+
+  const doForcePush = async (id: string, path: string, label: string) => {
+    setCardState(id, { pushing: true, pushProgress: 10, hasConflict: false });
+    addLog("info", "Starting force push...", id, label);
+    const branch = cardStates[id]?.status?.branch ?? "main";
+
+    try {
+      setCardState(id, { pushProgress: 50 });
+      await cmd.forcePushToRemote(path, token!, branch);
+      setCardState(id, { pushProgress: 100 });
+      updateProject(id, {
+        lastPushedAt: new Date().toISOString(),
+        lastPushStatus: "success",
+        lastCommitMessage: cardStates[id]?.status?.last_commit ?? "Force Pushed",
+      });
+      addLog("success", `Force push successful → ${branch}`, id, label);
+      showToast("success", "Force pushed successfully!");
+      await loadStatus(id, path);
+    } catch (e) {
+      updateProject(id, { lastPushStatus: "error" });
+      addLog("error", `Force push failed: ${e}`, id, label);
+      showToast("error", `Force push failed: ${e}`);
     } finally {
       setTimeout(() => setCardState(id, { pushing: false, pushProgress: 0 }), 1000);
     }
@@ -470,12 +504,21 @@ function LocalTab() {
 
                 {/* Actions */}
                 <div className="mt-3 flex items-center gap-2">
-                  <Button size="sm" variant="success" className="flex-1"
-                    loading={cs.pushing}
-                    disabled={!status?.is_git_repo || cs.pulling}
-                    onClick={() => handlePush(project.id, project.path, project.label)}>
-                    <UploadCloud className="h-4 w-4" /> Push
-                  </Button>
+                  {cs.hasConflict ? (
+                    <Button size="sm" variant="destructive" className="flex-1"
+                      loading={cs.pushing}
+                      disabled={!status?.is_git_repo || cs.pulling}
+                      onClick={() => doForcePush(project.id, project.path, project.label)}>
+                      <UploadCloud className="h-4 w-4" /> Force Push (ทับเซิร์ฟเวอร์)
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="success" className="flex-1"
+                      loading={cs.pushing}
+                      disabled={!status?.is_git_repo || cs.pulling}
+                      onClick={() => handlePush(project.id, project.path, project.label)}>
+                      <UploadCloud className="h-4 w-4" /> Push
+                    </Button>
+                  )}
                   <Button size="sm" variant="outline"
                     title="Manage branches"
                     disabled={!status?.is_git_repo}

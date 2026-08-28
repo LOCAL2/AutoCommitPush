@@ -5,3 +5,6 @@ incremental = true
 
 [profile.dev.package."*"]
 opt-level = 1
+
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"

@@ -21,6 +21,7 @@ pub fn run() {
             commands::git::stage_all_files,
             commands::git::create_commit,
             commands::git::push_to_remote,
+            commands::git::force_push_to_remote,
             commands::git::pull_from_remote,
             commands::git::get_branches,
             commands::git::create_branch,
