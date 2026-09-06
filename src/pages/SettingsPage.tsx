@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import {
   Moon, Sun, Monitor, LogOut, User, Container,
-  Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2,
+  Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2, Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -624,15 +624,62 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-3">
-              <Input
-                value={settings.bgImageUrl ?? ""}
-                onChange={(e) => {
-                  settings.setBgImageUrl(e.target.value);
-                  flashSaved();
-                }}
-                placeholder="Paste Image URL (e.g. https://images.unsplash.com/... or file:///...)"
-                className="text-xs font-mono"
-              />
+              <div className="flex gap-2">
+                <Input
+                  value={settings.bgImageUrl ?? ""}
+                  onChange={(e) => {
+                    settings.setBgImageUrl(e.target.value);
+                    flashSaved();
+                  }}
+                  placeholder="Paste Image URL or pick local file..."
+                  className="text-xs font-mono flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 text-xs gap-1.5"
+                  onClick={async () => {
+                    try {
+                      const { open } = await import("@tauri-apps/plugin-dialog");
+                      const selected = await open({
+                        multiple: false,
+                        filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "gif"] }],
+                      });
+                      if (selected && typeof selected === "string") {
+                        const fileUrl = selected.startsWith("file://")
+                          ? selected
+                          : `file:///${selected.replace(/\\/g, "/")}`;
+                        settings.setBgImageUrl(fileUrl);
+                        flashSaved();
+                        showToast("success", "Background image selected!");
+                      }
+                    } catch (err: any) {
+                      // Fallback HTML file picker if plugin-dialog is not active
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = "image/*";
+                      input.onchange = (e: any) => {
+                        const file = e.target?.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (re) => {
+                            if (re.target?.result) {
+                              settings.setBgImageUrl(re.target.result as string);
+                              flashSaved();
+                              showToast("success", "Background image loaded!");
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      };
+                      input.click();
+                    }
+                  }}
+                >
+                  <Upload className="h-3.5 w-3.5" /> Choose File
+                </Button>
+              </div>
 
               {/* Opacity Slider */}
               <div className="space-y-1.5 bg-muted/40 p-3 rounded-xl border">
