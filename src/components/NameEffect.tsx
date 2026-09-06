@@ -3,10 +3,8 @@ import { cn } from "@/lib/utils";
 
 export type NameEffectId =
   | "none"
-  // Typing Effects (3)
+  // Typing Effect (1)
   | "typing_hacker"
-  | "typing_neon"
-  | "typing_rainbow"
   // Popular & Glowing (10)
   | "rainbow_flow"
   | "neon_cyber"
@@ -29,10 +27,8 @@ export interface NameEffectOption {
 export const NAME_EFFECTS: NameEffectOption[] = [
   { id: "none", name: "Default Normal", category: "Popular", description: "ข้อความสีมาตรฐานตามธีม" },
 
-  // Typing Effects (3)
+  // Typing Effect (1)
   { id: "typing_hacker", name: "Terminal Hacker Typing", category: "Typing", description: "แฮกเกอร์เทอร์มินัลพิมพ์ข้อความทีละตัวพร้อมเคอร์เซอร์กะพริบ" },
-  { id: "typing_neon", name: "Cyber Neon Typewriter", category: "Typing", description: "พิมพ์ตัวอักษรเรืองแสงนีออนฟ้า-ชมพูสตรีทไซเบอร์" },
-  { id: "typing_rainbow", name: "Rainbow Flow Typing", category: "Typing", description: "พิมพ์ตัวอักษรเกรเดียนท์สายรุ้งพิมพ์สด" },
 
   // Glowing & Animated Effects (10)
   { id: "rainbow_flow", name: "Rainbow Flow", category: "Popular", description: "เกรเดียนท์สายรุ้งเคลื่อนไหวพริ้วไหว" },
@@ -106,7 +102,7 @@ export const NameEffect: React.FC<NameEffectProps> = ({
     return <span className={className}>{text}</span>;
   }
 
-  // ── Typing Effects ──
+  // ── Single Signature Typing Effect ──
   if (effectId === "typing_hacker") {
     return (
       <TypewriterEffect
@@ -114,28 +110,6 @@ export const NameEffect: React.FC<NameEffectProps> = ({
         textClassName={cn("font-mono text-emerald-400 font-bold [text-shadow:0_0_6px_rgba(52,211,153,0.8)]", className)}
         cursorClassName="text-emerald-400 font-mono font-bold"
         cursorChar="_"
-      />
-    );
-  }
-
-  if (effectId === "typing_neon") {
-    return (
-      <TypewriterEffect
-        text={text}
-        textClassName={cn("font-medium text-cyan-300 [text-shadow:0_0_8px_rgba(34,211,238,0.9),0_0_15px_rgba(244,114,182,0.7)]", className)}
-        cursorClassName="text-pink-400 font-bold"
-        cursorChar="|"
-      />
-    );
-  }
-
-  if (effectId === "typing_rainbow") {
-    return (
-      <TypewriterEffect
-        text={text}
-        textClassName={cn("bg-gradient-to-r from-red-500 via-amber-400 via-emerald-400 via-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent animate-rainbow-flow font-semibold", className)}
-        cursorClassName="text-amber-400 font-bold"
-        cursorChar="▌"
       />
     );
   }

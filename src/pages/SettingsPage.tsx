@@ -130,7 +130,7 @@ export default function SettingsPage() {
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    🖼️ Profile Frames ({AVATAR_FRAMES.length})
+                    Profile Frames ({AVATAR_FRAMES.length})
                   </button>
                   <button
                     type="button"
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    ✨ Name Effects ({NAME_EFFECTS.length})
+                    Name Effects ({NAME_EFFECTS.length})
                   </button>
                 </div>
 
