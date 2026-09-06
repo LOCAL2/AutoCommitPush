@@ -33,6 +33,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import GitignoreEditor from "@/components/GitignoreEditor";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
+import { NameEffect } from "@/components/NameEffect";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ProjectCardState {
   status: RepoStatus | null;
@@ -750,7 +752,7 @@ type SortKey = "updated" | "name" | "stars";
 
 function GitHubTab() {
   const { token, user } = useAuthStore();
-  const { avatarFrame } = useSettingsStore();
+  const { avatarFrame, nameEffect } = useSettingsStore();
   const { addProject } = useProjectStore();
   const { showToast } = useToast();
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
@@ -841,9 +843,13 @@ function GitHubTab() {
               frameId={avatarFrame}
             />
           )}
-          <p className="text-sm font-medium text-foreground">
-            {user?.login}
-          </p>
+          {user?.login && (
+            <NameEffect
+              text={user.name ?? user.login}
+              effectId={nameEffect}
+              className="text-sm font-medium"
+            />
+          )}
         </div>
         <Button size="sm" variant="outline" onClick={loadRepos} loading={loading}>
           <RefreshCw className="h-4 w-4" /> Refresh
