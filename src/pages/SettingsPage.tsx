@@ -34,13 +34,15 @@ function AutoSaveBadge({ saved }: { saved: boolean }) {
 export default function SettingsPage() {
   const settings = useSettingsStore();
   const { avatarFrame, setAvatarFrame, nameEffect, setNameEffect } = useSettingsStore();
+  const [activeCustomTab, setActiveCustomTab] = useState<"frames" | "name_effects">("frames");
   const [frameCategory, setFrameCategory] = useState<"All" | "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic">("All");
+  const [effectCategory, setEffectCategory] = useState<"All" | "Typing" | "Popular" | "Gaming" | "Luxury" | "Sci-Fi">("All");
   const { user, logout } = useAuthStore();
   const { showToast } = useToast();
   const [appVersion, setAppVersion] = useState<string>("");
 
   useEffect(() => {
-    getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.6"));
+    getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.8"));
   }, []);
 
   // Auto-save flash indicator
@@ -77,16 +79,19 @@ export default function SettingsPage() {
         <AutoSaveBadge saved={savedFlash} />
       </div>
 
-      {/* ── Account & Avatar Customization ── */}
+      {/* ── Account & Profile Customization ── */}
       {user && (
         <Card>
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <User className="h-4 w-4" /> Account & Profile Frame
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <User className="h-4 w-4 text-primary" /> Profile & Appearance Customization
+              </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between gap-3 pb-4 border-b">
+          <CardContent className="space-y-5">
+            {/* Live Profile Header Banner */}
+            <div className="flex items-center justify-between p-4 rounded-xl border bg-gradient-to-r from-card via-muted/40 to-card">
               <div className="flex items-center gap-4">
                 <AvatarWithFrame
                   src={user.avatar_url}
@@ -95,126 +100,165 @@ export default function SettingsPage() {
                   frameId={avatarFrame}
                 />
                 <div>
-                  <p className="font-semibold text-base">
+                  <p className="font-bold text-base">
                     <NameEffect text={user.name ?? user.login} effectId={nameEffect} />
                   </p>
                   <p className="text-xs text-muted-foreground">@{user.login}</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm"
+              <Button
+                variant="outline"
+                size="sm"
                 className="text-destructive hover:text-destructive shrink-0"
-                onClick={async () => { await logout(); showToast("info", "Logged out"); }}>
+                onClick={async () => { await logout(); showToast("info", "Logged out"); }}
+              >
                 <LogOut className="h-4 w-4" /> Sign Out
               </Button>
             </div>
 
-            {/* Frame Picker */}
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium">Avatar Profile Frames</h4>
-                <p className="text-xs text-muted-foreground">Select a custom border glow effect for your profile picture</p>
+            {/* Customization Sub-Tab Switcher & Category Filters */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b">
+                <div className="flex items-center gap-1.5 p-1 bg-muted/60 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setActiveCustomTab("frames")}
+                    className={cn(
+                      "px-3 py-1.5 text-xs font-medium rounded-lg transition-all select-none",
+                      activeCustomTab === "frames"
+                        ? "bg-background text-foreground shadow-sm font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    🖼️ Profile Frames ({AVATAR_FRAMES.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCustomTab("name_effects")}
+                    className={cn(
+                      "px-3 py-1.5 text-xs font-medium rounded-lg transition-all select-none",
+                      activeCustomTab === "name_effects"
+                        ? "bg-background text-foreground shadow-sm font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    ✨ Name Effects ({NAME_EFFECTS.length})
+                  </button>
+                </div>
+
+                {/* Category Filters depending on active tab */}
+                {activeCustomTab === "frames" ? (
+                  <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                    {(["All", "Sci-Fi", "Fantasy", "Luxury", "Cosmic", "Aesthetic"] as const).map((cat) => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setFrameCategory(cat)}
+                        className={cn(
+                          "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all shrink-0 select-none",
+                          frameCategory === cat
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                        )}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                    {(["All", "Typing", "Popular", "Gaming", "Luxury", "Sci-Fi"] as const).map((cat) => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setEffectCategory(cat)}
+                        className={cn(
+                          "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all shrink-0 select-none",
+                          effectCategory === cat
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                        )}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Category Filter Tabs */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                {(["All", "Sci-Fi", "Fantasy", "Luxury", "Cosmic", "Aesthetic"] as const).map((cat) => {
-                  const isActive = frameCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setFrameCategory(cat)}
-                      className={cn(
-                        "px-3 py-1 rounded-lg text-xs font-medium transition-all shrink-0 select-none",
-                        isActive
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-                      )}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto pr-1">
-                {AVATAR_FRAMES.filter((f) => frameCategory === "All" || f.category === frameCategory).map((frame) => {
-                  const isSelected = avatarFrame === frame.id;
-                  return (
-                    <button
-                      key={frame.id}
-                      type="button"
-                      onClick={() => {
-                        setAvatarFrame(frame.id);
-                        showToast("success", `Frame changed to ${frame.name}`);
-                      }}
-                      className={cn(
-                        "flex items-center gap-3 p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
-                        isSelected
-                          ? "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
-                          : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
-                      )}
-                    >
-                      <AvatarWithFrame
-                        src={user.avatar_url}
-                        alt={frame.name}
-                        size="md"
-                        frameId={frame.id}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-medium truncate">{frame.name}</span>
+              {/* Tab 1: Avatar Frames Grid */}
+              {activeCustomTab === "frames" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+                  {AVATAR_FRAMES.filter((f) => frameCategory === "All" || f.category === frameCategory).map((frame) => {
+                    const isSelected = avatarFrame === frame.id;
+                    return (
+                      <button
+                        key={frame.id}
+                        type="button"
+                        onClick={() => {
+                          setAvatarFrame(frame.id);
+                          showToast("success", `Frame: ${frame.name}`);
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                          isSelected
+                            ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
+                            : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
+                        )}
+                      >
+                        <AvatarWithFrame
+                          src={user.avatar_url}
+                          alt={frame.name}
+                          size="md"
+                          frameId={frame.id}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium truncate">{frame.name}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{frame.description}</p>
                         </div>
-                        <p className="text-[11px] text-muted-foreground truncate">{frame.description}</p>
-                      </div>
-                      {isSelected && (
-                        <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            {/* Name Effect Picker */}
-            <div className="space-y-4 pt-4 border-t">
-              <div>
-                <h4 className="text-sm font-medium">Username Animation Effects</h4>
-                <p className="text-xs text-muted-foreground">Select an animated text gradient or glow effect for your username</p>
-              </div>
+                        {isSelected && (
+                          <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto pr-1">
-                {NAME_EFFECTS.map((effect) => {
-                  const isSelected = nameEffect === effect.id;
-                  return (
-                    <button
-                      key={effect.id}
-                      type="button"
-                      onClick={() => {
-                        setNameEffect(effect.id);
-                        showToast("success", `Name effect changed to ${effect.name}`);
-                      }}
-                      className={cn(
-                        "flex items-center gap-3 p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
-                        isSelected
-                          ? "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
-                          : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
-                      )}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span className="text-xs font-semibold">
+              {/* Tab 2: Name Effects Grid */}
+              {activeCustomTab === "name_effects" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+                  {NAME_EFFECTS.filter((e) => effectCategory === "All" || e.category === effectCategory).map((effect) => {
+                    const isSelected = nameEffect === effect.id;
+                    return (
+                      <button
+                        key={effect.id}
+                        type="button"
+                        onClick={() => {
+                          setNameEffect(effect.id);
+                          showToast("success", `Name Effect: ${effect.name}`);
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                          isSelected
+                            ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
+                            : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
+                        )}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold mb-0.5 truncate">
                             <NameEffect text={user.name ?? user.login} effectId={effect.id} />
-                          </span>
+                          </p>
+                          <p className="text-[10px] text-muted-foreground truncate">{effect.description}</p>
                         </div>
-                        <p className="text-[11px] text-muted-foreground truncate">{effect.description}</p>
-                      </div>
-                      {isSelected && (
-                        <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                        {isSelected && (
+                          <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
