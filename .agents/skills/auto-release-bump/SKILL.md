@@ -19,7 +19,7 @@ When invoked or requested to release an update or push code:
 4. **Execute Release Git Commands (PowerShell Compatible)**:
    Run the following terminal commands sequentially (using `;` as command separator for Windows PowerShell):
    ```powershell
-   git add . ; git commit -m "Release vX.Y.Z" ; git push ; git tag vX.Y.Z ; git push origin vX.Y.Z
+   git add . ; git commit -m "Release vX.Y.Z {commit message / details}" ; git push ; git tag vX.Y.Z ; git push origin vX.Y.Z
    ```
 5. **Notify the User**:
    Confirm to the user that version `vX.Y.Z` has been bumped, tagged, and pushed to GitHub. Remind them that GitHub Actions is building the `.exe` installer and `latest.json` on the cloud (takes ~3-5 mins), after which users can auto-update directly in the app.
