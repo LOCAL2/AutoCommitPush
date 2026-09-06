@@ -293,18 +293,17 @@ export default function CreateRepoDialog({
         </div>
 
         {/* Footer Action Buttons */}
-        <div className="flex gap-2.5 px-5 py-3.5 border-t bg-muted/20">
-          <Button variant="outline" size="sm" onClick={onClose} disabled={loading} className="flex-1 rounded-xl">
+        <div className="flex gap-3 px-6 py-4 border-t bg-muted/20">
+          <Button variant="outline" onClick={onClose} disabled={loading} className="flex-1 rounded-xl h-10 text-sm font-medium">
             Cancel
           </Button>
 
           {nameStatus !== "taken" && (
             <Button
-              size="sm"
               onClick={handleCreate}
               loading={loading}
               disabled={nameStatus !== "available"}
-              className="flex-1 rounded-xl text-white font-semibold shadow-sm"
+              className="flex-1 rounded-xl h-10 text-sm text-white font-semibold shadow-sm"
             >
               <Github className="h-4 w-4" /> Create Repository
             </Button>

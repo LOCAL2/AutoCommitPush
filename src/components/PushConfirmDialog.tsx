@@ -216,16 +216,15 @@ export default function PushConfirmDialog({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex gap-2.5 px-5 py-3.5 border-t bg-muted/20">
-          <Button variant="outline" size="sm" onClick={onCancel} className="flex-1 rounded-xl">
+        <div className="flex gap-3 px-6 py-4 border-t bg-muted/20">
+          <Button variant="outline" onClick={onCancel} className="flex-1 rounded-xl h-10 text-sm font-medium">
             Cancel
           </Button>
           <Button
             variant="success"
-            size="sm"
             onClick={() => onConfirm(commitMsg.trim() || defaultCommitMessage)}
             disabled={!status.remote_url || !commitMsg.trim() || totalChanges === 0}
-            className="flex-1 rounded-xl"
+            className="flex-1 rounded-xl h-10 text-sm font-semibold"
           >
             <UploadCloud className="h-4 w-4" />
             Push to {branch}
