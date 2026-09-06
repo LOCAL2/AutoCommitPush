@@ -1,13 +1,15 @@
 import { useState, useCallback } from "react";
 import {
   X, UploadCloud, GitBranch, Globe,
-  AlertCircle, Sparkles, ChevronDown,
+  AlertCircle, Sparkles, ChevronDown, Bot, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { RepoStatus, FileDiff } from "@/types";
 import { useSettingsStore } from "@/store/settingsStore";
+import { useToast } from "@/components/ui/toast";
 import { generateCommitMessage, getCommitSuggestions } from "@/lib/commit-message";
+import { generateAiCommitMessage } from "@/lib/ai-commit";
 import ChangesDiffPanel from "@/components/ChangesDiffPanel";
 
 interface Props {
@@ -25,8 +27,10 @@ export default function PushConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  const { defaultCommitMessage } = useSettingsStore();
+  const { defaultCommitMessage, aiApiKey, aiProvider } = useSettingsStore();
+  const { showToast } = useToast();
   const [diffCache, setDiffCache] = useState<Record<string, FileDiff>>({});
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
   // Auto-generate on open (no diff yet — refines once diffs load)
   const [commitMsg, setCommitMsg] = useState(() => {
@@ -53,6 +57,30 @@ export default function PushConfirmDialog({
   const branch = status.branch ?? "main";
   const remote = status.remote_url ?? "(no remote)";
   const totalChanges = status.pending_changes;
+
+  const handleAiGenerate = async () => {
+    setIsGeneratingAi(true);
+    try {
+      // Build summary text from diffCache or status files
+      let diffSummary = "";
+      const cacheEntries = Object.values(diffCache);
+      if (cacheEntries.length > 0) {
+        diffSummary = cacheEntries
+          .map((d) => `File: ${d.path}\n` + d.lines.slice(0, 30).map((l) => `${l.origin} ${l.content}`).join("\n"))
+          .join("\n\n");
+      } else {
+        diffSummary = `Modified: ${status.modified.join(", ")}\nAdded: ${status.untracked.join(", ")}\nDeleted: ${status.deleted.join(", ")}`;
+      }
+
+      const aiMsg = await generateAiCommitMessage(diffSummary, aiApiKey, aiProvider);
+      setCommitMsg(aiMsg);
+      showToast("success", "AI generated commit message!");
+    } catch (err: any) {
+      showToast("error", err.message || "Failed to generate AI commit message");
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -114,13 +142,34 @@ export default function PushConfirmDialog({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Commit Message</label>
-              <button
-                onClick={() => setCommitMsg(generateCommitMessage(status, diffCache))}
-                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
-              >
-                <Sparkles className="h-3 w-3" />
-                Auto-generate
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isGeneratingAi}
+                  onClick={handleAiGenerate}
+                  className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 transition-colors font-medium"
+                >
+                  {isGeneratingAi ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Generating AI...
+                    </>
+                  ) : (
+                    <>
+                      <Bot className="h-3.5 w-3.5" />
+                      AI Generate
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCommitMsg(generateCommitMessage(status, diffCache))}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  Auto
+                </button>
+              </div>
             </div>
 
             <Input

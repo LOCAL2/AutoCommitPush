@@ -8,6 +8,9 @@ import { createTauriStorage } from "@/lib/tauriStorage";
 interface SettingsState extends AppSettings {
   avatarFrame: AvatarFrameId;
   nameEffect: NameEffectId;
+  // AI Settings
+  aiProvider: "gemini" | "openai";
+  aiApiKey: string;
   // Docker Hub
   dockerUsername: string;
   dockerPassword: string;
@@ -16,6 +19,7 @@ interface SettingsState extends AppSettings {
   setTheme: (theme: Theme) => void;
   setAvatarFrame: (frame: AvatarFrameId) => void;
   setNameEffect: (effect: NameEffectId) => void;
+  setAiSettings: (provider: "gemini" | "openai", apiKey: string) => void;
   setDefaultCommitMessage: (msg: string) => void;
   setDefaultPrivate: (v: boolean) => void;
   setLaunchOnStartup: (v: boolean) => void;
@@ -30,6 +34,9 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       avatarFrame: "none",
       nameEffect: "none",
+      // AI
+      aiProvider: "gemini",
+      aiApiKey: "",
       // Git / commit
       defaultCommitMessage: "Update project",
       defaultPrivate: false,
@@ -45,6 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) => set({ theme }),
       setAvatarFrame: (avatarFrame) => set({ avatarFrame }),
       setNameEffect: (nameEffect) => set({ nameEffect }),
+      setAiSettings: (aiProvider, aiApiKey) => set({ aiProvider, aiApiKey }),
       setDefaultCommitMessage: (defaultCommitMessage) => set({ defaultCommitMessage }),
       setDefaultPrivate: (defaultPrivate) => set({ defaultPrivate }),
       setLaunchOnStartup: (launchOnStartup) => set({ launchOnStartup }),

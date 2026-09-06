@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import {
   Moon, Sun, Monitor, LogOut, User, Container,
-  Eye, EyeOff, CheckCircle2,
+  Eye, EyeOff, CheckCircle2, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/toast";
 import { AvatarWithFrame, AVATAR_FRAMES } from "@/components/AvatarWithFrame";
 import { NameEffect, NAME_EFFECTS } from "@/components/NameEffect";
+import { testAiConnection } from "@/lib/ai-commit";
 import { cn } from "@/lib/utils";
 import type { Theme } from "@/types";
 
@@ -40,6 +41,8 @@ export default function SettingsPage() {
   const { user, logout } = useAuthStore();
   const { showToast } = useToast();
   const [appVersion, setAppVersion] = useState<string>("");
+  const [showAiKey, setShowAiKey] = useState(false);
+  const [testingAi, setTestingAi] = useState(false);
 
   useEffect(() => {
     getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.8"));
@@ -263,6 +266,104 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* ── AI Commit Generator ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-amber-400" /> AI Commit Generator Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">AI Provider</label>
+            <div className="flex gap-2">
+              {(["gemini", "openai"] as const).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => {
+                    settings.setAiSettings(p, settings.aiApiKey);
+                    flashSaved();
+                  }}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg border text-xs font-medium transition-all capitalize select-none",
+                    settings.aiProvider === p
+                      ? "border-primary bg-primary/10 text-primary font-semibold shadow-sm"
+                      : "border-border hover:bg-muted text-muted-foreground"
+                  )}
+                >
+                  {p === "gemini" ? "Google Gemini" : "OpenAI"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">
+                {settings.aiProvider === "gemini" ? "Gemini API Key" : "OpenAI API Key"}
+              </label>
+              <span className="text-[11px] text-muted-foreground">Optional (Custom Key)</span>
+            </div>
+            <div className="relative">
+              <Input
+                type={showAiKey ? "text" : "password"}
+                value={settings.aiApiKey}
+                onChange={(e) => {
+                  settings.setAiSettings(settings.aiProvider, e.target.value);
+                  flashSaved();
+                }}
+                placeholder={
+                  settings.aiProvider === "gemini"
+                    ? "Enter Gemini API Key (e.g. AIzaSy...)"
+                    : "Enter OpenAI API Key (e.g. sk-...)"
+                }
+                className="pr-10 font-mono text-xs"
+              />
+              <button
+                type="button"
+                onClick={() => setShowAiKey(!showAiKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showAiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {settings.aiApiKey
+                ? "Custom API Key saved. Used for AI Commit Message generation."
+                : "Leave blank to use free built-in fallback."}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t">
+            <span className="text-xs text-muted-foreground">
+              Test your AI API connection before pushing
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={testingAi}
+              onClick={async () => {
+                setTestingAi(true);
+                try {
+                  const sampleMsg = await testAiConnection(
+                    settings.aiApiKey,
+                    settings.aiProvider
+                  );
+                  showToast("success", `Connection Success! Test response: "${sampleMsg}"`);
+                } catch (err: any) {
+                  showToast("error", `Connection Failed: ${err.message || String(err)}`);
+                } finally {
+                  setTestingAi(false);
+                }
+              }}
+            >
+              {testingAi ? "Testing..." : "⚡ Test Connection"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* ── App Updates ── */}
       <Card>
