@@ -11,7 +11,7 @@ import LogsPage from "@/pages/LogsPage";
 import SettingsPage from "@/pages/SettingsPage";
 
 function ThemeHandler() {
-  const { theme, accentColor } = useSettingsStore();
+  const { theme } = useSettingsStore();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -33,14 +33,7 @@ function ThemeHandler() {
       // Theme preset (dracula, nord, synthwave, monokai, github)
       root.classList.add(`theme-${theme}`);
     }
-
-    // Set custom accent color attribute
-    if (accentColor && accentColor !== "default") {
-      root.setAttribute("data-accent", accentColor);
-    } else {
-      root.removeAttribute("data-accent");
-    }
-  }, [theme, accentColor]);
+  }, [theme]);
 
   return null;
 }

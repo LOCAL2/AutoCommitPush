@@ -157,14 +157,6 @@
     --input: 212 18% 22%;
     --ring: 212 92% 43%;
   }
-
-  /* Custom Accent Color Overrides */
-  [data-accent="blue"] { --primary: 217 91% 60%; --ring: 217 91% 60%; }
-  [data-accent="purple"] { --primary: 270 91% 65%; --ring: 270 91% 65%; }
-  [data-accent="emerald"] { --primary: 158 64% 52%; --ring: 158 64% 52%; }
-  [data-accent="amber"] { --primary: 38 92% 50%; --ring: 38 92% 50%; }
-  [data-accent="rose"] { --primary: 346 87% 65%; --ring: 346 87% 65%; }
-  [data-accent="cyan"] { --primary: 189 94% 43%; --ring: 189 94% 43%; }
 }
 
 @layer base {

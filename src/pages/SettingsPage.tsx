@@ -597,42 +597,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Accent Color Selection */}
-          <div className="space-y-2 pt-2 border-t">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Custom Accent Color
-            </label>
-            <div className="flex flex-wrap gap-2.5">
-              {[
-                { value: "default", label: "Default", color: "bg-blue-500" },
-                { value: "blue", label: "Blue", color: "bg-blue-600" },
-                { value: "purple", label: "Purple", color: "bg-purple-600" },
-                { value: "emerald", label: "Emerald", color: "bg-emerald-500" },
-                { value: "amber", label: "Amber", color: "bg-amber-500" },
-                { value: "rose", label: "Rose", color: "bg-rose-500" },
-                { value: "cyan", label: "Cyan", color: "bg-cyan-500" },
-              ].map((a) => (
-                <button
-                  key={a.value}
-                  type="button"
-                  onClick={() => {
-                    settings.setAccentColor(a.value as any);
-                    flashSaved();
-                  }}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all select-none",
-                    (settings.accentColor ?? "default") === a.value
-                      ? "border-primary bg-primary/10 text-primary font-semibold ring-1 ring-primary"
-                      : "border-border hover:bg-muted text-muted-foreground"
-                  )}
-                >
-                  <span className={cn("w-3 h-3 rounded-full shrink-0", a.color)} />
-                  <span>{a.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Custom Background Image & Opacity */}
           <div className="space-y-3 pt-2 border-t">
             <div className="flex items-center justify-between">
