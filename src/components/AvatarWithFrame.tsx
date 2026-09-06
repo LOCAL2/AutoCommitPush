@@ -3,21 +3,26 @@ import { cn } from "@/lib/utils";
 
 export type AvatarFrameId =
   | "none"
-  // Sci-Fi & Cyberpunk (10)
+  // Sci-Fi & Cyberpunk (13)
   | "cyber_orbit" | "hologram_scanner" | "laser_crosshair" | "matrix_code" | "quantum_ring"
   | "hud_targeting" | "cyber_glitch" | "tron_disc" | "hyper_drive" | "reactor_core"
-  // Magic & Fantasy (10)
+  | "neon_grid" | "plasma_shield" | "warp_portal"
+  // Magic & Fantasy (13)
   | "dragon_fire" | "sakura_aura" | "arcane_rune" | "frost_crystal" | "thunder_strike"
   | "phoenix_flame" | "holy_halo" | "dark_abyss" | "nature_vines" | "poison_mist"
-  // Royalty & Luxury (10)
+  | "blood_moon" | "celestial_star" | "fairy_dust"
+  // Royalty & Luxury (13)
   | "royal_gold" | "diamond_crystal" | "ruby_empress" | "emerald_sovereign" | "rose_gold"
   | "platinum_crown" | "sapphire_star" | "pearl_shimmer" | "amethyst_gem" | "black_obsidian"
-  // Cosmic & Astronomy (10)
+  | "golden_laurel" | "jade_emperor" | "champagne_sparkle"
+  // Cosmic & Astronomy (13)
   | "cosmic_nebula" | "supernova_burst" | "aurora_borealis" | "black_hole" | "solar_flare"
   | "starlight_ring" | "meteor_shower" | "milky_way" | "quasar_ray" | "eclipse_corona"
-  // Aesthetic & Modern (10)
+  | "comet_tail" | "pulsar_star" | "galaxy_core"
+  // Aesthetic & Modern (13)
   | "synthwave_sun" | "vaporwave_pink" | "prism_chroma" | "neon_gradient" | "holographic_foil"
-  | "minimal_white" | "sunset_glow" | "pastel_candy" | "cyber_lime" | "monochrome_luxe";
+  | "minimal_white" | "sunset_glow" | "pastel_candy" | "cyber_lime" | "monochrome_luxe"
+  | "gradient_wave" | "electric_cyan" | "retro_arcade";
 
 export interface AvatarFrameOption {
   id: AvatarFrameId;
@@ -29,7 +34,7 @@ export interface AvatarFrameOption {
 export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "none", name: "Default", category: "Aesthetic", description: "วงแหวนเรียบหรูมินิมอลมาตรฐาน" },
 
-  // Sci-Fi & Cyberpunk (10)
+  // Sci-Fi & Cyberpunk (13)
   { id: "cyber_orbit", name: "Cyber Satellite Orbit", category: "Sci-Fi", description: "ดาวเทียมไซเบอร์ 2 ชั้นหมุนสวนทิศทาง" },
   { id: "hologram_scanner", name: "Holographic Radar Scanner", category: "Sci-Fi", description: "ลำแสงเรดาร์สแกนเนอร์โฮโลแกรมหมุนวน" },
   { id: "laser_crosshair", name: "Targeting Crosshair HUD", category: "Sci-Fi", description: "เป้าเล็งเลเซอร์อนาคตพร้อมจุดล็อคเป้า" },
@@ -40,8 +45,11 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "tron_disc", name: "TRON Energy Disc", category: "Sci-Fi", description: "จานพลังงานไซเบอร์สเปซ TRON สีส้มสด" },
   { id: "hyper_drive", name: "Hyper Drive Laser RGB", category: "Sci-Fi", description: "เลเซอร์ RGB ความเร็วสูงหมุนรอบอวตาร" },
   { id: "reactor_core", name: "Plasma Core Reactor", category: "Sci-Fi", description: "แกนเตาปฏิกรณ์พลาสม่าม่วงเรืองแสง" },
+  { id: "neon_grid", name: "Neon Matrix Grid", category: "Sci-Fi", description: "ตาข่ายพิกเซลนีออนไซเบอร์สเปซหมุนวน" },
+  { id: "plasma_shield", name: "Plasma Force Shield", category: "Sci-Fi", description: "เกราะพลาสม่ากักเก็บพลังงานเรืองแสง" },
+  { id: "warp_portal", name: "Warp Space Portal", category: "Sci-Fi", description: "ประตูมิติข้ามอวกาศวาร์ปพอร์ทัล" },
 
-  // Magic & Fantasy (10)
+  // Magic & Fantasy (13)
   { id: "dragon_fire", name: "Inferno Dragon Flame", category: "Fantasy", description: "เปลวเพลิงมังกรส้มแดงพริ้วลุกโชน" },
   { id: "sakura_aura", name: "Sakura Blossom Aura", category: "Fantasy", description: "ออร่าละอองกลีบซากุระชมพูนุ่มนวล" },
   { id: "arcane_rune", name: "Arcane Magic Circle", category: "Fantasy", description: "วงเวทจอมเวทเวทมนตร์เส้นปะหมุนวน" },
@@ -52,8 +60,11 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "dark_abyss", name: "Shadow Abyss Realm", category: "Fantasy", description: "ออร่าเงามืดปีศาจสีแดงดำลึกลับ" },
   { id: "nature_vines", name: "Enchanted Nature Forest", category: "Fantasy", description: "ออร่าป่าเวทมนตร์ใบไม้เขียวขจีสดชื่น" },
   { id: "poison_mist", name: "Toxic Venom Viper", category: "Fantasy", description: "หมอกพิษเรืองแสงนีออนเขียวอันตราย" },
+  { id: "blood_moon", name: "Blood Moon Eclipse", category: "Fantasy", description: "พระจันทร์เลือดออร่าแดงเข้มลึกลับ" },
+  { id: "celestial_star", name: "Celestial Star Light", category: "Fantasy", description: "ประกายดาวศุกร์สรวงสวรรค์สว่างไสว" },
+  { id: "fairy_dust", name: "Fairy Pixie Dust", category: "Fantasy", description: "ละอองมนตราพิกซี่แฟรี่เรืองแสง" },
 
-  // Royalty & Luxury (10)
+  // Royalty & Luxury (13)
   { id: "royal_gold", name: "Royal Imperial Gold", category: "Luxury", description: "รัศมีทองคำบริสุทธิ์เส้นปะหมุนลักชูรี" },
   { id: "diamond_crystal", name: "Diamond Crystal Halo", category: "Luxury", description: "ประกายเพชรใสคริสตัลเงางามหรูหรา" },
   { id: "ruby_empress", name: "Empress Ruby Gem", category: "Luxury", description: "อัญมณีทับทิมสีแดงก่ำสุดพรีเมียม" },
@@ -64,8 +75,11 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "pearl_shimmer", name: "Iridescent Night Pearl", category: "Luxury", description: "ไข่มุกราตรีเรืองแสงชิมเมอร์เงาวับ" },
   { id: "amethyst_gem", name: "Amethyst Purple Gem", category: "Luxury", description: "พลอยแอเมทิสต์สีม่วงเมฆหมอกราชวงศ์" },
   { id: "black_obsidian", name: "Black Obsidian Gold Rim", category: "Luxury", description: "หินออบซิเดียนดำขอบทองคำสุดพรีเมียม" },
+  { id: "golden_laurel", name: "Golden Laurel Wreath", category: "Luxury", description: "ช่อใบลอเรลทองคำแห่งชัยชนะ" },
+  { id: "jade_emperor", name: "Imperial Jade Crown", category: "Luxury", description: "หยกจักรพรรดิเขียวใสเลอค่า" },
+  { id: "champagne_sparkle", name: "Champagne Gold Sparkle", category: "Luxury", description: "แชมเปญโกลด์ประกายฟองระยิบระยับ" },
 
-  // Cosmic & Astronomy (10)
+  // Cosmic & Astronomy (13)
   { id: "cosmic_nebula", name: "Cosmic Nebula Dust", category: "Cosmic", description: "ออโรราฝุ่นเนบิวลาห้วงจักรวาลลึก" },
   { id: "supernova_burst", name: "Supernova Explosion", category: "Cosmic", description: "ซูเปอร์โนวาดาวระเบิดสีฟ้าสว่างไสว" },
   { id: "aurora_borealis", name: "Northern Aurora Lights", category: "Cosmic", description: "แสงเหนือออโรราสีเขียวพลิ้วไหวสวยงาม" },
@@ -76,8 +90,11 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "milky_way", name: "Milky Way Spiral", category: "Cosmic", description: "เกลียวทางช้างเผือกจักรวาลลึก" },
   { id: "quasar_ray", name: "Quasar Energy Beam", category: "Cosmic", description: "ลำแสงพลังงานควอซาร์สุดอลังการ" },
   { id: "eclipse_corona", name: "Golden Eclipse Halo", category: "Cosmic", description: "คอโรนาสุริยุปราคาทองคำมืดมิด" },
+  { id: "comet_tail", name: "Ice Comet Tail", category: "Cosmic", description: "หางดาวหางน้ำแข็งสีฟ้าสว่าง" },
+  { id: "pulsar_star", name: "Pulsar Neutron Star", category: "Cosmic", description: "ดาวนิวตรอนพัลซาร์ปล่อยคลื่นวิทยุ" },
+  { id: "galaxy_core", name: "Galaxy Deep Core", category: "Cosmic", description: "แกนกลางดาราจักรหมุนวนอวกาศ" },
 
-  // Aesthetic & Modern (10)
+  // Aesthetic & Modern (13)
   { id: "synthwave_sun", name: "Synthwave 80s Sun", category: "Aesthetic", description: "ดวงอาทิตย์นีออนเรโทร 80s ดิสโก้" },
   { id: "vaporwave_pink", name: "Vaporwave Pastel Dream", category: "Aesthetic", description: "เฉดสีพาสเทลชมพูฟ้าเวเพอร์เวฟ" },
   { id: "prism_chroma", name: "Prism Spectrum Rainbow", category: "Aesthetic", description: "เกรเดียนท์ปริซึมสะท้อนแสงรุ้งหลากสี" },
@@ -88,6 +105,9 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "pastel_candy", name: "Pastel Sweet Candy", category: "Aesthetic", description: "ลูกกวาดพาสเทลสีหวานน่ารัก" },
   { id: "cyber_lime", name: "Cyberpunk Lime Neon", category: "Aesthetic", description: "มะนาวนีออนสดใสสตรีทสไตล์" },
   { id: "monochrome_luxe", name: "Monochrome Minimal", category: "Aesthetic", description: "ขาวดำมินิมอลโมโนโครมสุดเท่" },
+  { id: "gradient_wave", name: "Fluid Gradient Wave", category: "Aesthetic", description: "คลื่นเกรเดียนท์สีสดใสไหลละมุน" },
+  { id: "electric_cyan", name: "Electric Cyan Pulse", category: "Aesthetic", description: "ฟ้าไซอันกระแสไฟฟ้าเรืองแสง" },
+  { id: "retro_arcade", name: "Retro Pixel Arcade", category: "Aesthetic", description: "พิกเซลเกมตู้อาร์เคดยุค 90s" },
 ];
 
 interface AvatarWithFrameProps {
@@ -470,6 +490,106 @@ export const AvatarWithFrame: React.FC<AvatarWithFrameProps> = ({
         <>
           <div className="absolute -inset-[3px] rounded-full bg-gradient-to-r from-slate-400 via-zinc-100 to-slate-500 opacity-75 blur-[3.5px]" />
           <div className="absolute -inset-[1.5px] rounded-full border border-white/80" />
+        </>
+      )}
+
+      {/* ── New Sci-Fi (3) ── */}
+      {frameId === "neon_grid" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full border-2 border-dotted border-emerald-400 animate-[spin_8s_linear_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-cyan-400/80 blur-[1px]" />
+        </>
+      )}
+      {frameId === "plasma_shield" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-400 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-300 shadow-[0_0_10px_rgba(56,189,248,0.9)]" />
+        </>
+      )}
+      {frameId === "warp_portal" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-[conic-gradient(from_0deg,#3b82f6,#8b5cf6,#ec4899,#3b82f6)] opacity-85 blur-[4px] animate-[spin_2s_linear_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-purple-300/80" />
+        </>
+      )}
+
+      {/* ── New Fantasy (3) ── */}
+      {frameId === "blood_moon" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-red-700 via-rose-600 to-red-950 opacity-90 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-red-500 shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
+        </>
+      )}
+      {frameId === "celestial_star" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-amber-200 via-sky-200 to-yellow-100 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-amber-200 shadow-[0_0_9px_rgba(253,230,138,0.9)]" />
+        </>
+      )}
+      {frameId === "fairy_dust" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-200 opacity-80 blur-[3.5px] animate-[pulse_2s_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-dashed border-pink-200/90 animate-[spin_10s_linear_infinite]" />
+        </>
+      )}
+
+      {/* ── New Luxury (3) ── */}
+      {frameId === "golden_laurel" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full border-2 border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.8)]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-dashed border-yellow-200 animate-[spin_12s_linear_infinite]" />
+        </>
+      )}
+      {frameId === "jade_emperor" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-emerald-600 via-green-400 to-teal-500 opacity-85 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+        </>
+      )}
+      {frameId === "champagne_sparkle" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 opacity-90 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-amber-200/90 shadow-[0_0_7px_rgba(252,211,77,0.8)]" />
+        </>
+      )}
+
+      {/* ── New Cosmic (3) ── */}
+      {frameId === "comet_tail" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 opacity-85 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-sky-300/80 shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+        </>
+      )}
+      {frameId === "pulsar_star" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-400 to-cyan-400 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-fuchsia-300 shadow-[0_0_9px_rgba(232,121,249,0.8)]" />
+        </>
+      )}
+      {frameId === "galaxy_core" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-[conic-gradient(from_0deg,#4f46e5,#9333ea,#e11d48,#4f46e5)] opacity-85 blur-[4.5px] animate-[spin_4s_linear_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-indigo-300/80" />
+        </>
+      )}
+
+      {/* ── New Aesthetic (3) ── */}
+      {frameId === "gradient_wave" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-violet-500 via-rose-400 to-amber-300 opacity-85 blur-[4px] animate-rainbow-flow" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-white/70" />
+        </>
+      )}
+      {frameId === "electric_cyan" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 opacity-90 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-300 shadow-[0_0_9px_rgba(34,211,238,0.9)]" />
+        </>
+      )}
+      {frameId === "retro_arcade" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full border-2 border-dashed border-amber-400 animate-[spin_6s_linear_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-pink-500" />
         </>
       )}
 

@@ -5,7 +5,7 @@ export type NameEffectId =
   | "none"
   // Typing Effect (1)
   | "typing_hacker"
-  // Popular & Glowing (10)
+  // Popular & Glowing (20)
   | "rainbow_flow"
   | "neon_cyber"
   | "royal_gold"
@@ -15,7 +15,17 @@ export type NameEffectId =
   | "cosmic_nebula"
   | "frost_ice"
   | "synthwave_80s"
-  | "sakura_pink";
+  | "sakura_pink"
+  | "emerald_shine"
+  | "amethyst_aura"
+  | "toxic_slime"
+  | "electric_zap"
+  | "plasma_violet"
+  | "sunset_orange"
+  | "ocean_deep"
+  | "ruby_flame"
+  | "golden_laurel_text"
+  | "silver_chrome";
 
 export interface NameEffectOption {
   id: NameEffectId;
@@ -30,7 +40,7 @@ export const NAME_EFFECTS: NameEffectOption[] = [
   // Typing Effect (1)
   { id: "typing_hacker", name: "Terminal Hacker Typing", category: "Typing", description: "แฮกเกอร์เทอร์มินัลพิมพ์ข้อความทีละตัวพร้อมเคอร์เซอร์กะพริบ" },
 
-  // Glowing & Animated Effects (10)
+  // Glowing & Animated Effects (20)
   { id: "rainbow_flow", name: "Rainbow Flow", category: "Popular", description: "เกรเดียนท์สายรุ้งเคลื่อนไหวพริ้วไหว" },
   { id: "neon_cyber", name: "Neon Cyber Glow", category: "Gaming", description: "นีออนสีฟ้า-ชมพูเรืองแสงสไตล์เกมเมอร์" },
   { id: "royal_gold", name: "Imperial Gold Shimmer", category: "Luxury", description: "ทองคำบริสุทธิ์สะท้อนแสงพรีเมียม" },
@@ -41,6 +51,16 @@ export const NAME_EFFECTS: NameEffectOption[] = [
   { id: "frost_ice", name: "Frost Blizzard Ice", category: "Gaming", description: "คริสตัลน้ำแข็งสีฟ้าใสฉ่ำเย็น" },
   { id: "synthwave_80s", name: "Synthwave Sunset", category: "Popular", description: "เกรเดียนท์พระอาทิตย์ตกดิสโก้ 80s" },
   { id: "sakura_pink", name: "Sakura Blossom Pink", category: "Popular", description: "กลีบซากุระชมพูหวานสดใสนุ่มนวล" },
+  { id: "emerald_shine", name: "Emerald Crystal Shine", category: "Luxury", description: "มรกตเขียวมลทินเรืองแสงประกาย" },
+  { id: "amethyst_aura", name: "Amethyst Mystical Purple", category: "Sci-Fi", description: "แอเมทิสต์สีม่วงลึกลับเปล่งรัศมี" },
+  { id: "toxic_slime", name: "Toxic Venom Slime", category: "Gaming", description: "เขียวนีออนพิษสลีมสไตล์ไซไฟ" },
+  { id: "electric_zap", name: "Electric Zap Thunder", category: "Gaming", description: "สายฟ้าสีฟ้าอมเขียวช็อตเรืองแสง" },
+  { id: "plasma_violet", name: "Plasma Core Violet", category: "Sci-Fi", description: "พลาสม่าม่วงเรืองพลังงานอนาคต" },
+  { id: "sunset_orange", name: "Sunset Horizon Orange", category: "Popular", description: "ขอบฟ้าอาทิตย์อัสดงสีส้มทอง" },
+  { id: "ocean_deep", name: "Deep Ocean Aqua", category: "Popular", description: "น้ำทะเลลึกอควาสีฟ้าครามกระจ่าง" },
+  { id: "ruby_flame", name: "Empress Ruby Flame", category: "Luxury", description: "ทับทิมแดงก่ำสะท้อนแสงพรีเมียม" },
+  { id: "golden_laurel_text", name: "Golden Victor Laurel", category: "Luxury", description: "ทองคำแห่งชัยชนะรัศมีสีทอง" },
+  { id: "silver_chrome", name: "Silver Metallic Chrome", category: "Sci-Fi", description: "เงินโครเมียมสะท้อนแสงโลหะ" },
 ];
 
 const TypewriterEffect: React.FC<{
@@ -136,6 +156,26 @@ export const NameEffect: React.FC<NameEffectProps> = ({
       "bg-gradient-to-r from-fuchsia-500 via-rose-400 to-amber-400 bg-clip-text text-transparent animate-rainbow-flow font-semibold",
     sakura_pink:
       "bg-gradient-to-r from-pink-400 via-rose-300 to-pink-200 bg-clip-text text-transparent font-medium drop-shadow-[0_0_6px_rgba(244,114,182,0.7)]",
+    emerald_shine:
+      "bg-gradient-to-r from-emerald-400 via-teal-300 to-green-500 bg-clip-text text-transparent font-semibold drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+    amethyst_aura:
+      "bg-gradient-to-r from-purple-400 via-violet-300 to-fuchsia-400 bg-clip-text text-transparent font-semibold drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]",
+    toxic_slime:
+      "bg-gradient-to-r from-lime-400 via-emerald-400 to-yellow-300 bg-clip-text text-transparent font-bold animate-pulse drop-shadow-[0_0_8px_rgba(163,230,53,0.9)]",
+    electric_zap:
+      "text-cyan-300 font-mono font-bold [text-shadow:0_0_8px_rgba(34,211,238,0.95),0_0_15px_rgba(56,189,248,0.8)] animate-pulse",
+    plasma_violet:
+      "bg-gradient-to-r from-violet-500 via-purple-300 to-indigo-400 bg-clip-text text-transparent font-bold animate-rainbow-flow drop-shadow-[0_0_8px_rgba(167,139,250,0.8)]",
+    sunset_orange:
+      "bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 bg-clip-text text-transparent font-semibold drop-shadow-[0_0_6px_rgba(251,146,60,0.8)]",
+    ocean_deep:
+      "bg-gradient-to-r from-sky-400 via-cyan-300 to-blue-600 bg-clip-text text-transparent font-semibold drop-shadow-[0_0_7px_rgba(56,189,248,0.8)]",
+    ruby_flame:
+      "bg-gradient-to-r from-rose-600 via-red-500 to-pink-500 bg-clip-text text-transparent font-bold drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]",
+    golden_laurel_text:
+      "bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 bg-clip-text text-transparent font-bold animate-pulse drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]",
+    silver_chrome:
+      "bg-gradient-to-r from-slate-300 via-zinc-100 to-slate-400 bg-clip-text text-transparent font-bold drop-shadow-[0_0_6px_rgba(226,232,240,0.8)]",
   };
 
   return (
