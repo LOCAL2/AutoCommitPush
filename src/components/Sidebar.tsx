@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { AvatarWithFrame } from "@/components/AvatarWithFrame";
+import { NameEffect } from "@/components/NameEffect";
 
 const navItems = [
   { to: "/", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" },
@@ -19,11 +20,11 @@ const navItems = [
 export default function Sidebar() {
   const { user } = useAuthStore();
   const { projects } = useProjectStore();
-  const { avatarFrame } = useSettingsStore();
+  const { avatarFrame, nameEffect } = useSettingsStore();
   const [appVersion, setAppVersion] = useState<string>("");
 
   useEffect(() => {
-    getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.6"));
+    getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.8"));
   }, []);
 
   return (
@@ -82,7 +83,9 @@ export default function Sidebar() {
               frameId={avatarFrame}
             />
             <div className="min-w-0">
-              <p className="text-xs font-medium truncate">{user.name ?? user.login}</p>
+              <p className="text-xs font-medium truncate">
+                <NameEffect text={user.name ?? user.login} effectId={nameEffect} />
+              </p>
               <p className="text-xs text-muted-foreground truncate">@{user.login}</p>
             </div>
           </div>

@@ -11,6 +11,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/toast";
 import { AvatarWithFrame, AVATAR_FRAMES } from "@/components/AvatarWithFrame";
+import { NameEffect, NAME_EFFECTS } from "@/components/NameEffect";
 import { cn } from "@/lib/utils";
 import type { Theme } from "@/types";
 
@@ -32,7 +33,7 @@ function AutoSaveBadge({ saved }: { saved: boolean }) {
 
 export default function SettingsPage() {
   const settings = useSettingsStore();
-  const { avatarFrame, setAvatarFrame } = useSettingsStore();
+  const { avatarFrame, setAvatarFrame, nameEffect, setNameEffect } = useSettingsStore();
   const [frameCategory, setFrameCategory] = useState<"All" | "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic">("All");
   const { user, logout } = useAuthStore();
   const { showToast } = useToast();
@@ -94,7 +95,9 @@ export default function SettingsPage() {
                   frameId={avatarFrame}
                 />
                 <div>
-                  <p className="font-semibold text-base">{user.name ?? user.login}</p>
+                  <p className="font-semibold text-base">
+                    <NameEffect text={user.name ?? user.login} effectId={nameEffect} />
+                  </p>
                   <p className="text-xs text-muted-foreground">@{user.login}</p>
                 </div>
               </div>
@@ -163,6 +166,47 @@ export default function SettingsPage() {
                           <span className="text-xs font-medium truncate">{frame.name}</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground truncate">{frame.description}</p>
+                      </div>
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Name Effect Picker */}
+            <div className="space-y-4 pt-4 border-t">
+              <div>
+                <h4 className="text-sm font-medium">Username Animation Effects</h4>
+                <p className="text-xs text-muted-foreground">Select an animated text gradient or glow effect for your username</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                {NAME_EFFECTS.map((effect) => {
+                  const isSelected = nameEffect === effect.id;
+                  return (
+                    <button
+                      key={effect.id}
+                      type="button"
+                      onClick={() => {
+                        setNameEffect(effect.id);
+                        showToast("success", `Name effect changed to ${effect.name}`);
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
+                          : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
+                      )}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-xs font-semibold">
+                            <NameEffect text={user.name ?? user.login} effectId={effect.id} />
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate">{effect.description}</p>
                       </div>
                       {isSelected && (
                         <div className="w-2 h-2 rounded-full bg-primary shrink-0" />

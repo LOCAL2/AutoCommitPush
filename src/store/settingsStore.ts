@@ -2,10 +2,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AppSettings, Theme } from "@/types";
 import type { AvatarFrameId } from "@/components/AvatarWithFrame";
+import type { NameEffectId } from "@/components/NameEffect";
 import { createTauriStorage } from "@/lib/tauriStorage";
 
 interface SettingsState extends AppSettings {
   avatarFrame: AvatarFrameId;
+  nameEffect: NameEffectId;
   // Docker Hub
   dockerUsername: string;
   dockerPassword: string;
@@ -13,6 +15,7 @@ interface SettingsState extends AppSettings {
   // Actions
   setTheme: (theme: Theme) => void;
   setAvatarFrame: (frame: AvatarFrameId) => void;
+  setNameEffect: (effect: NameEffectId) => void;
   setDefaultCommitMessage: (msg: string) => void;
   setDefaultPrivate: (v: boolean) => void;
   setLaunchOnStartup: (v: boolean) => void;
@@ -26,6 +29,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       avatarFrame: "none",
+      nameEffect: "none",
       // Git / commit
       defaultCommitMessage: "Update project",
       defaultPrivate: false,
@@ -40,6 +44,7 @@ export const useSettingsStore = create<SettingsState>()(
 
       setTheme: (theme) => set({ theme }),
       setAvatarFrame: (avatarFrame) => set({ avatarFrame }),
+      setNameEffect: (nameEffect) => set({ nameEffect }),
       setDefaultCommitMessage: (defaultCommitMessage) => set({ defaultCommitMessage }),
       setDefaultPrivate: (defaultPrivate) => set({ defaultPrivate }),
       setLaunchOnStartup: (launchOnStartup) => set({ launchOnStartup }),

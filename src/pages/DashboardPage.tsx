@@ -9,6 +9,7 @@ import { useProjectStore } from "@/store/projectStore";
 import { useAuthStore } from "@/store/authStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { AvatarWithFrame } from "@/components/AvatarWithFrame";
+import { NameEffect } from "@/components/NameEffect";
 import { useLogStore } from "@/store/logStore";
 import { formatDate } from "@/lib/utils";
 import { GitHubCalendar } from "react-github-calendar";
@@ -18,9 +19,8 @@ import "react-tooltip/dist/react-tooltip.css";
 export default function DashboardPage() {
   const { projects } = useProjectStore();
   const { user } = useAuthStore();
-  const { avatarFrame } = useSettingsStore();
+  const { avatarFrame, nameEffect, theme } = useSettingsStore();
   const { logs } = useLogStore();
-  const { theme } = useSettingsStore();
 
   const totalProjects = projects.length;
   const pushedProjects = projects.filter((p) => p.lastPushedAt).length;
@@ -84,7 +84,9 @@ export default function DashboardPage() {
                 frameId={avatarFrame}
               />
               <div>
-                <p className="font-medium">{user.name ?? user.login}</p>
+                <p className="font-medium text-base">
+                  <NameEffect text={user.name ?? user.login} effectId={nameEffect} />
+                </p>
                 <p className="text-sm text-muted-foreground">@{user.login}</p>
                 <div className="flex gap-3 mt-1">
                   <span className="text-xs text-muted-foreground">
