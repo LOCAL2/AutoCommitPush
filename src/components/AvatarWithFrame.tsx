@@ -7,25 +7,38 @@ export type AvatarFrameId =
   | "cyber_orbit" | "hologram_scanner" | "laser_crosshair" | "matrix_code" | "quantum_ring"
   | "hud_targeting" | "cyber_glitch" | "tron_disc" | "hyper_drive" | "reactor_core"
   | "neon_grid" | "plasma_shield" | "warp_portal"
-  // Magic & Fantasy (13)
+  // Mythical Beasts & Dragons (20)
+  | "golden_dragon_aura" | "cny_lion_dance" | "shenron_emerald" | "fire_dragon_king" | "frost_dragon_glacier"
+  | "black_dragon_abyss" | "thunder_dragon_raijin" | "celestial_wyrm" | "hydra_venom" | "drake_inferno"
+  | "lion_dance_festive" | "imperial_lion_guardian" | "gold_lion_fortune" | "jade_lion_emperor" | "fire_lion_rage"
+  | "kitsune_nine_tails" | "fenrir_wolf_moon" | "basilisk_poison" | "leviathan_ocean" | "behemoth_earth"
+  // Magic & Fantasy (15)
   | "dragon_fire" | "sakura_aura" | "arcane_rune" | "frost_crystal" | "thunder_strike"
   | "phoenix_flame" | "holy_halo" | "dark_abyss" | "nature_vines" | "poison_mist"
-  | "blood_moon" | "celestial_star" | "fairy_dust"
-  // Royalty & Luxury (13)
+  | "blood_moon" | "celestial_star" | "fairy_dust" | "angel_wings_gold" | "demon_horns_crimson"
+  // Gaming & Esports (18)
+  | "esports_champion" | "gamer_rgb_pulse" | "rank_radiant_star" | "rank_immortal_crown" | "rank_challenger_gold"
+  | "headshot_sniper" | "pixel_hero_sword" | "retro_gameboy" | "arcade_combo_master" | "cyber_samurai"
+  | "mecha_gundam_core" | "ninja_shadow_blade" | "overdrive_nitro" | "stealth_assassin" | "vampire_bat_aura"
+  | "valkyrie_shield" | "gladiator_arena" | "titan_iron_colossus"
+  // Royalty & Luxury (15)
   | "royal_gold" | "diamond_crystal" | "ruby_empress" | "emerald_sovereign" | "rose_gold"
   | "platinum_crown" | "sapphire_star" | "pearl_shimmer" | "amethyst_gem" | "black_obsidian"
-  | "golden_laurel" | "jade_emperor" | "champagne_sparkle"
-  // Cosmic & Astronomy (13)
+  | "golden_laurel" | "jade_emperor" | "champagne_sparkle" | "sovereign_ring_ruby" | "sovereign_ring_sapphire"
+  // Cosmic & Astronomy (15)
   | "cosmic_nebula" | "supernova_burst" | "aurora_borealis" | "black_hole" | "solar_flare"
   | "starlight_ring" | "meteor_shower" | "milky_way" | "quasar_ray" | "eclipse_corona"
-  | "comet_tail" | "pulsar_star" | "galaxy_core"
+  | "comet_tail" | "pulsar_star" | "galaxy_core" | "cosmic_vortex" | "dark_matter_halo"
+  | "space_time_rift"
   // Aesthetic & Modern (13)
   | "synthwave_sun" | "vaporwave_pink" | "prism_chroma" | "neon_gradient" | "holographic_foil"
   | "minimal_white" | "sunset_glow" | "pastel_candy" | "cyber_lime" | "monochrome_luxe"
   | "gradient_wave" | "electric_cyan" | "retro_arcade"
-  // Seasonal & Festival (8)
+  // Seasonal & Festival (15)
   | "valentines_cupid" | "chinese_cny_dragon" | "halloween_pumpkin" | "christmas_snow"
-  | "cyber_valentine" | "cny_red_lantern" | "sakura_romantic" | "golden_firecracker";
+  | "cyber_valentine" | "cny_red_lantern" | "sakura_romantic" | "golden_firecracker"
+  | "valentine_roses_glow" | "cny_golden_rat" | "cny_fortune_cat" | "cny_red_packet"
+  | "songkran_water_splash" | "mid_autumn_mooncake" | "halloween_ghost_flame";
 
 export interface AvatarFrameOption {
   id: AvatarFrameId;
@@ -36,6 +49,48 @@ export interface AvatarFrameOption {
 
 export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "none", name: "Default", category: "Aesthetic", description: "วงแหวนเรียบหรูมินิมอลมาตรฐาน" },
+
+  // Mythical Beasts & Dragons (20)
+  { id: "golden_dragon_aura", name: "Golden Imperial Dragon", category: "Fantasy", description: "ออร่ามังกรทองคำจักรพรรดิเรืองแสง 360 องศา" },
+  { id: "cny_lion_dance", name: "CNY Lion Dance Festive", category: "Seasonal", description: "สิงโตเชิดมงคลตรุษจีนสีแดงทองโชคลาภ" },
+  { id: "shenron_emerald", name: "Shenron Emerald Dragon", category: "Fantasy", description: "มังกรเขียวมรกตเทพเจ้าประทานพร" },
+  { id: "fire_dragon_king", name: "Fire Dragon King Inferno", category: "Fantasy", description: "พญามังกรเพลิงพิโรธไฟลุกโชน" },
+  { id: "frost_dragon_glacier", name: "Frost Dragon Ice Glacier", category: "Fantasy", description: "มังกรน้ำแข็งเยือกแข็งรัศมีหิมะ" },
+  { id: "black_dragon_abyss", name: "Black Dragon Void Abyss", category: "Fantasy", description: "มังกรดำอนธการออร่าเงามืด" },
+  { id: "thunder_dragon_raijin", name: "Thunder Dragon Raijin", category: "Fantasy", description: "มังกรสายฟ้าอัคนีผ่าประกายวูบวาบ" },
+  { id: "celestial_wyrm", name: "Celestial Star Wyrm", category: "Fantasy", description: "มังกรสวรรค์รัศมีดวงดาวสีฟ้าคราม" },
+  { id: "hydra_venom", name: "Toxic Hydra Venom Dragon", category: "Fantasy", description: "มังกรไฮดราพิษเขียวนีออนอันตราย" },
+  { id: "drake_inferno", name: "Magma Drake Volcano", category: "Fantasy", description: "มังกรลาวาภูเขาไฟแมกม่าเดือด" },
+  { id: "lion_dance_festive", name: "Festive Red Lion Dance", category: "Seasonal", description: "หัวสิงโตนำโชคสีแดงสดฉลองเทศกาล" },
+  { id: "imperial_lion_guardian", name: "Imperial Lion Guardian Gold", category: "Luxury", description: "สิงโตสวรรค์เฝ้าทวารทองคำแท้" },
+  { id: "gold_lion_fortune", name: "Golden Fortune Lion", category: "Seasonal", description: "สิงโตทองคำนำโชคลาภเงินทองมหาเฮง" },
+  { id: "jade_lion_emperor", name: "Imperial Jade Lion", category: "Luxury", description: "สิงโตหยกเขียวประกายเพชรจักรพรรดิ" },
+  { id: "fire_lion_rage", name: "Blazing Fire Lion Rage", category: "Fantasy", description: "สิงโตเพลิงคำรามแผดเผาไฟแดง" },
+  { id: "kitsune_nine_tails", name: "Kitsune Nine-Tails Fox", category: "Fantasy", description: "จิ้งจอกเก้าหางออร่าเวทมนตร์ม่วงชมพู" },
+  { id: "fenrir_wolf_moon", name: "Fenrir Frost Wolf Moon", category: "Fantasy", description: "หมาป่าเฟนรีร์ใต้แสงจันทร์เต็มดวง" },
+  { id: "basilisk_poison", name: "Basilisk Serpent Poison", category: "Fantasy", description: "พญางูพิษบาซิลลิสก์เขียวนีออน" },
+  { id: "leviathan_ocean", name: "Leviathan Ocean Abyssal", category: "Fantasy", description: "อสูรกายลีเวียธานใต้ท้องทะเลลึก" },
+  { id: "behemoth_earth", name: "Behemoth Titan Earth", category: "Fantasy", description: "พญาอสูรบีฮีมอธศิลาแผ่นดินแผดเผา" },
+
+  // Gaming & Esports (18)
+  { id: "esports_champion", name: "Esports Champion Trophy", category: "Sci-Fi", description: "กรอบถ้วยแชมป์โลก Esports เรืองแสง" },
+  { id: "gamer_rgb_pulse", name: "Gamer RGB Mechanical Pulse", category: "Sci-Fi", description: "ไฟ RGB คีย์บอร์ดเกมมิ่งหมุนวน 360" },
+  { id: "rank_radiant_star", name: "Rank Radiant Immortal", category: "Sci-Fi", description: "แรงก์เรเดียนต์ดาวสีฟ้าประกายทอง" },
+  { id: "rank_immortal_crown", name: "Rank Immortal Sovereign", category: "Sci-Fi", description: "มงกุฎอิมมอร์ทัลสีแดงชาดเกมมิ่ง" },
+  { id: "rank_challenger_gold", name: "Rank Challenger League", category: "Sci-Fi", description: "แรงก์ชาเลนเจอร์ทองคำขอบปีกอินทรี" },
+  { id: "headshot_sniper", name: "Headshot Sniper Crosshair", category: "Sci-Fi", description: "สโคปสไนเปอร์เลเซอร์ล็อคเป้าหัว" },
+  { id: "pixel_hero_sword", name: "Pixel Sword Legend", category: "Sci-Fi", description: "ดาบพิกเซลฮีโร่เกมส์ 8-bit อาร์เคด" },
+  { id: "retro_gameboy", name: "Retro Game Boy Arcade", category: "Sci-Fi", description: "กรอบเรโทรเกมบอยพิกเซลย้อนยุค" },
+  { id: "arcade_combo_master", name: "Arcade Combo Master 999", category: "Sci-Fi", description: "เอฟเฟกต์คอมโบ 999+ นีออนเกมตู้" },
+  { id: "cyber_samurai", name: "Cyber Samurai Katana", category: "Sci-Fi", description: "ดาบคาตานะนีออนซามูไรไซเบอร์" },
+  { id: "mecha_gundam_core", name: "Mecha Gundam Armor Core", category: "Sci-Fi", description: "หุ่นยนต์เมคคาหุ้มเกราะกัมดั้มเรืองแสง" },
+  { id: "ninja_shadow_blade", name: "Shadow Ninja Shuriken", category: "Sci-Fi", description: "ดาวกระจายนินจาเงาเงามืดเรืองแสง" },
+  { id: "overdrive_nitro", name: "Overdrive Racing Nitro", category: "Sci-Fi", description: "ไนโตรสายฟ้าความเร็วสูงหมุนวน" },
+  { id: "stealth_assassin", name: "Stealth Assassin Red Sight", category: "Sci-Fi", description: "ศูนย์เล็งนักฆ่าลอบสังหารสีแดง" },
+  { id: "vampire_bat_aura", name: "Vampire Lord Crimson Bat", category: "Fantasy", description: "แวมไพร์ลอร์ดค้างคาวเลือดเรืองประกาย" },
+  { id: "valkyrie_shield", name: "Valkyrie Sacred Shield", category: "Fantasy", description: "เกราะวาลคิรีสวรรค์สีทองปีกนก" },
+  { id: "gladiator_arena", name: "Gladiator Arena Golden Rim", category: "Fantasy", description: "กรอบลานประลองกลาดิเอเตอร์ทองคำ" },
+  { id: "titan_iron_colossus", name: "Titan Iron Colossus", category: "Sci-Fi", description: "หุ้มเกราะเหล็กกล้าไททันมหึมา" },
 
   // Sci-Fi & Cyberpunk (13)
   { id: "cyber_orbit", name: "Cyber Satellite Orbit", category: "Sci-Fi", description: "ดาวเทียมไซเบอร์ 2 ชั้นหมุนสวนทิศทาง" },
@@ -52,7 +107,7 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "plasma_shield", name: "Plasma Force Shield", category: "Sci-Fi", description: "เกราะพลาสม่ากักเก็บพลังงานเรืองแสง" },
   { id: "warp_portal", name: "Warp Space Portal", category: "Sci-Fi", description: "ประตูมิติข้ามอวกาศวาร์ปพอร์ทัล" },
 
-  // Magic & Fantasy (13)
+  // Magic & Fantasy (15)
   { id: "dragon_fire", name: "Inferno Dragon Flame", category: "Fantasy", description: "เปลวเพลิงมังกรส้มแดงพริ้วลุกโชน" },
   { id: "sakura_aura", name: "Sakura Blossom Aura", category: "Fantasy", description: "ออร่าละอองกลีบซากุระชมพูนุ่มนวล" },
   { id: "arcane_rune", name: "Arcane Magic Circle", category: "Fantasy", description: "วงเวทจอมเวทเวทมนตร์เส้นปะหมุนวน" },
@@ -66,8 +121,10 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "blood_moon", name: "Blood Moon Eclipse", category: "Fantasy", description: "พระจันทร์เลือดออร่าแดงเข้มลึกลับ" },
   { id: "celestial_star", name: "Celestial Star Light", category: "Fantasy", description: "ประกายดาวศุกร์สรวงสวรรค์สว่างไสว" },
   { id: "fairy_dust", name: "Fairy Pixie Dust", category: "Fantasy", description: "ละอองมนตราพิกซี่แฟรี่เรืองแสง" },
+  { id: "angel_wings_gold", name: "Seraphim Gold Angel Wings", category: "Fantasy", description: "ปีกทูตสวรรค์เซราฟิมทองคำแท้" },
+  { id: "demon_horns_crimson", name: "Archdemon Crimson Horns", category: "Fantasy", description: "เขาปีศาจแดงเลือดพิโรธเรืองแสง" },
 
-  // Royalty & Luxury (13)
+  // Royalty & Luxury (15)
   { id: "royal_gold", name: "Royal Imperial Gold", category: "Luxury", description: "รัศมีทองคำบริสุทธิ์เส้นปะหมุนลักชูรี" },
   { id: "diamond_crystal", name: "Diamond Crystal Halo", category: "Luxury", description: "ประกายเพชรใสคริสตัลเงางามหรูหรา" },
   { id: "ruby_empress", name: "Empress Ruby Gem", category: "Luxury", description: "อัญมณีทับทิมสีแดงก่ำสุดพรีเมียม" },
@@ -81,8 +138,10 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "golden_laurel", name: "Golden Laurel Wreath", category: "Luxury", description: "ช่อใบลอเรลทองคำแห่งชัยชนะ" },
   { id: "jade_emperor", name: "Imperial Jade Crown", category: "Luxury", description: "หยกจักรพรรดิเขียวใสเลอค่า" },
   { id: "champagne_sparkle", name: "Champagne Gold Sparkle", category: "Luxury", description: "แชมเปญโกลด์ประกายฟองระยิบระยับ" },
+  { id: "sovereign_ring_ruby", name: "Sovereign Crown Ruby Rim", category: "Luxury", description: "ขอบวงแหวนทับทิมทองคำจักรพรรดิ์" },
+  { id: "sovereign_ring_sapphire", name: "Royal Sapphire Diamond Rim", category: "Luxury", description: "วงแหวนไพลินล้อมเพชรแท้ลักชูรี" },
 
-  // Cosmic & Astronomy (13)
+  // Cosmic & Astronomy (15)
   { id: "cosmic_nebula", name: "Cosmic Nebula Dust", category: "Cosmic", description: "ออโรราฝุ่นเนบิวลาห้วงจักรวาลลึก" },
   { id: "supernova_burst", name: "Supernova Explosion", category: "Cosmic", description: "ซูเปอร์โนวาดาวระเบิดสีฟ้าสว่างไสว" },
   { id: "aurora_borealis", name: "Northern Aurora Lights", category: "Cosmic", description: "แสงเหนือออโรราสีเขียวพลิ้วไหวสวยงาม" },
@@ -96,6 +155,9 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "comet_tail", name: "Ice Comet Tail", category: "Cosmic", description: "หางดาวหางน้ำแข็งสีฟ้าสว่าง" },
   { id: "pulsar_star", name: "Pulsar Neutron Star", category: "Cosmic", description: "ดาวนิวตรอนพัลซาร์ปล่อยคลื่นวิทยุ" },
   { id: "galaxy_core", name: "Galaxy Deep Core", category: "Cosmic", description: "แกนกลางดาราจักรหมุนวนอวกาศ" },
+  { id: "cosmic_vortex", name: "Interstellar Cosmic Vortex", category: "Cosmic", description: "พายุมืดห้วงอนันตจักรวาลวาร์ป" },
+  { id: "dark_matter_halo", name: "Dark Matter Singularity", category: "Cosmic", description: "สสารมืดดูดกลืนมิติอวกาศเรืองแสง" },
+  { id: "space_time_rift", name: "Space-Time Quantum Rift", category: "Cosmic", description: "รอยแยกมิติเวลาสีเขียวมรกต" },
 
   // Aesthetic & Modern (13)
   { id: "synthwave_sun", name: "Synthwave 80s Sun", category: "Aesthetic", description: "ดวงอาทิตย์นีออนเรโทร 80s ดิสโก้" },
@@ -112,14 +174,21 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "electric_cyan", name: "Electric Cyan Pulse", category: "Aesthetic", description: "ฟ้าไซอันกระแสไฟฟ้าเรืองแสง" },
   { id: "retro_arcade", name: "Retro Pixel Arcade", category: "Aesthetic", description: "พิกเซลเกมตู้อาร์เคดยุค 90s" },
 
-  // Seasonal & Festival (8)
+  // Seasonal & Festival (15)
   { id: "valentines_cupid", name: "Valentine Heart Cupid", category: "Seasonal", description: "ออร่าหัวใจกามเทพคิวปิดวาเลนไทน์ชมพูเรืองแสง" },
   { id: "chinese_cny_dragon", name: "CNY Imperial Red Dragon", category: "Seasonal", description: "มังกรทองตรุษจีนมงคลแดงทองมหาเฮง" },
   { id: "cny_red_lantern", name: "CNY Red Lantern Gold", category: "Seasonal", description: "โคมไฟแดงตรุษจีนรัศมีทองคำโชคลาภ" },
   { id: "golden_firecracker", name: "CNY Golden Firecracker", category: "Seasonal", description: "ประทัดมงคลทองคำต้อนรับปีใหม่จีน" },
   { id: "cyber_valentine", name: "Cyberpunk Pink Neon Heart", category: "Seasonal", description: "หัวใจนีออนชมพูไซเบอร์พังค์อนาคต" },
   { id: "sakura_romantic", name: "Romantic Sakura Love", category: "Seasonal", description: "กลีบซากุระแห่งความรักหวานละมุน" },
+  { id: "valentine_roses_glow", name: "Valentine Glowing Red Roses", category: "Seasonal", description: "ดอกกุหลาบแดงช่อโตฉลองวาเลนไทน์" },
+  { id: "cny_golden_rat", name: "CNY Golden Wealth Mouse", category: "Seasonal", description: "เหรียญทองกิมตุ้งรับทรัพย์ตรุษจีน" },
+  { id: "cny_fortune_cat", name: "CNY Lucky Fortune Cat", category: "Seasonal", description: "แมวนำโชคกวักทรัพย์กวักลาภสีทอง" },
+  { id: "cny_red_packet", name: "CNY Ang Pao Red Packet", category: "Seasonal", description: "ซองอั่งเปาสีแดงสดใสประดับรัศมีทอง" },
+  { id: "songkran_water_splash", name: "Songkran Festival Splash", category: "Seasonal", description: "สายน้ำสงกรานต์ดับร้อนเย็นชุ่มฉ่ำ" },
+  { id: "mid_autumn_mooncake", name: "Mid-Autumn Moon Cake", category: "Seasonal", description: "ขนมไหว้พระจันทร์แสงจันทร์เหลืองนวล" },
   { id: "halloween_pumpkin", name: "Halloween Spooky Pumpkin", category: "Seasonal", description: "ฟักทองฮาโลวีนส้มดำลึกลับประดับออร่า" },
+  { id: "halloween_ghost_flame", name: "Halloween Spectral Ghost", category: "Seasonal", description: "ดวงวิญญาณผีน้อยสีเขียวฟ้าฮาโลวีน" },
   { id: "christmas_snow", name: "Merry Christmas Blizzard", category: "Seasonal", description: "คริสต์มาสหิมะโปรยปรายละอองทองมงคล" },
 ];
 
@@ -606,7 +675,283 @@ export const AvatarWithFrame: React.FC<AvatarWithFrameProps> = ({
         </>
       )}
 
-      {/* ── Seasonal & Festival (8) ── */}
+      {/* ── Mythical Beasts & Dragons (20) ── */}
+      {frameId === "golden_dragon_aura" && (
+        <>
+          <div className="absolute -inset-[5px] rounded-full bg-[conic-gradient(from_0deg,#eab308,#ef4444,#f59e0b,#eab308)] opacity-95 blur-[5px] animate-[spin_5s_linear_infinite]" />
+          <div className="absolute -inset-[2px] rounded-full border-2 border-amber-300 shadow-[0_0_14px_rgba(234,179,8,0.95)]" />
+        </>
+      )}
+      {frameId === "cny_lion_dance" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-red-600 via-amber-400 to-red-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-400 shadow-[0_0_12px_rgba(239,68,68,0.95)]" />
+        </>
+      )}
+      {frameId === "shenron_emerald" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-emerald-600 via-green-400 to-teal-300 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.9)]" />
+        </>
+      )}
+      {frameId === "fire_dragon_king" && (
+        <>
+          <div className="absolute -inset-[5px] rounded-full bg-gradient-to-r from-red-700 via-orange-500 to-amber-400 opacity-95 blur-[5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-orange-400 shadow-[0_0_14px_rgba(249,115,22,0.95)]" />
+        </>
+      )}
+      {frameId === "frost_dragon_glacier" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-sky-500 via-cyan-300 to-blue-600 opacity-90 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-200 shadow-[0_0_10px_rgba(6,182,212,0.9)]" />
+        </>
+      )}
+      {frameId === "black_dragon_abyss" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-purple-950 via-slate-900 to-red-950 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-purple-600 shadow-[0_0_12px_rgba(147,51,234,0.85)]" />
+        </>
+      )}
+      {frameId === "thunder_dragon_raijin" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-cyan-400 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-yellow-200 shadow-[0_0_12px_rgba(250,204,21,0.95)]" />
+        </>
+      )}
+      {frameId === "celestial_wyrm" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-blue-600 via-indigo-400 to-sky-300 opacity-90 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-sky-300 shadow-[0_0_10px_rgba(56,189,248,0.9)]" />
+        </>
+      )}
+      {frameId === "hydra_venom" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-lime-500 via-emerald-400 to-green-600 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-lime-300 shadow-[0_0_12px_rgba(132,204,22,0.95)]" />
+        </>
+      )}
+      {frameId === "drake_inferno" && (
+        <>
+          <div className="absolute -inset-[5px] rounded-full bg-gradient-to-r from-amber-600 via-red-600 to-yellow-500 opacity-95 blur-[5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.9)]" />
+        </>
+      )}
+      {frameId === "lion_dance_festive" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-red-600 via-amber-400 to-red-600 opacity-95 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.9)]" />
+        </>
+      )}
+      {frameId === "imperial_lion_guardian" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-600 opacity-95 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.95)]" />
+        </>
+      )}
+      {frameId === "gold_lion_fortune" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-yellow-200 shadow-[0_0_12px_rgba(250,204,21,0.95)]" />
+        </>
+      )}
+      {frameId === "jade_lion_emperor" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-emerald-600 via-green-400 to-teal-400 opacity-90 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
+        </>
+      )}
+      {frameId === "fire_lion_rage" && (
+        <>
+          <div className="absolute -inset-[5px] rounded-full bg-gradient-to-r from-red-600 via-orange-500 to-red-700 opacity-95 blur-[5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-orange-400 shadow-[0_0_12px_rgba(239,68,68,0.95)]" />
+        </>
+      )}
+      {frameId === "kitsune_nine_tails" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-pink-500 via-purple-400 to-rose-400 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-pink-300 shadow-[0_0_10px_rgba(236,72,153,0.9)]" />
+        </>
+      )}
+      {frameId === "fenrir_wolf_moon" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-700 opacity-90 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.9)]" />
+        </>
+      )}
+      {frameId === "basilisk_poison" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-emerald-500 via-lime-400 to-teal-600 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.95)]" />
+        </>
+      )}
+      {frameId === "leviathan_ocean" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-blue-700 via-cyan-400 to-indigo-800 opacity-90 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.9)]" />
+        </>
+      )}
+      {frameId === "behemoth_earth" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-700 via-orange-600 to-stone-800 opacity-90 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.85)]" />
+        </>
+      )}
+
+      {/* ── Gaming & Esports (18) ── */}
+      {frameId === "esports_champion" && (
+        <>
+          <div className="absolute -inset-[5px] rounded-full bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.95)]" />
+        </>
+      )}
+      {frameId === "gamer_rgb_pulse" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-[conic-gradient(from_0deg,#ef4444,#eab308,#22c55e,#06b6d4,#3b82f6,#a855f7,#ef4444)] opacity-95 blur-[4.5px] animate-[spin_3s_linear_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-white/80" />
+        </>
+      )}
+      {frameId === "rank_radiant_star" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-cyan-400 via-sky-200 to-amber-300 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.95)]" />
+        </>
+      )}
+      {frameId === "rank_immortal_crown" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-red-600 via-rose-400 to-amber-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.95)]" />
+        </>
+      )}
+      {frameId === "rank_challenger_gold" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-600 opacity-95 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.9)]" />
+        </>
+      )}
+      {frameId === "headshot_sniper" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-red-500 via-rose-500 to-red-700 opacity-90 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-dashed border-red-400 animate-[spin_8s_linear_infinite]" />
+        </>
+      )}
+      {frameId === "pixel_hero_sword" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full border-2 border-dashed border-sky-400 animate-[spin_6s_linear_infinite]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-amber-400" />
+        </>
+      )}
+      {frameId === "retro_gameboy" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-emerald-500 via-lime-400 to-teal-500 opacity-85 blur-[3.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-emerald-400" />
+        </>
+      )}
+      {frameId === "arcade_combo_master" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-fuchsia-500 via-yellow-400 to-cyan-400 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-fuchsia-300 shadow-[0_0_10px_rgba(217,70,239,0.9)]" />
+        </>
+      )}
+      {frameId === "cyber_samurai" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-cyan-500 via-pink-500 to-purple-600 opacity-90 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.9)]" />
+        </>
+      )}
+      {frameId === "mecha_gundam_core" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-blue-600 via-red-500 to-yellow-400 opacity-95 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.9)]" />
+        </>
+      )}
+      {frameId === "ninja_shadow_blade" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-violet-600 via-purple-500 to-slate-900 opacity-90 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.85)]" />
+        </>
+      )}
+      {frameId === "overdrive_nitro" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-cyan-400 via-blue-600 to-indigo-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.95)]" />
+        </>
+      )}
+      {frameId === "stealth_assassin" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-red-600 via-slate-900 to-red-800 opacity-90 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
+        </>
+      )}
+      {frameId === "vampire_bat_aura" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-rose-700 via-purple-900 to-red-600 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.9)]" />
+        </>
+      )}
+      {frameId === "valkyrie_shield" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-300 via-yellow-100 to-amber-400 opacity-90 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-200 shadow-[0_0_10px_rgba(251,191,36,0.9)]" />
+        </>
+      )}
+      {frameId === "gladiator_arena" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-700 opacity-90 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.85)]" />
+        </>
+      )}
+      {frameId === "titan_iron_colossus" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-slate-600 via-gray-400 to-slate-700 opacity-85 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-slate-300 shadow-[0_0_8px_rgba(203,213,225,0.8)]" />
+        </>
+      )}
+
+      {/* ── More Seasonal & Festival (8) ── */}
+      {frameId === "valentine_roses_glow" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-rose-600 via-red-500 to-pink-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.95)]" />
+        </>
+      )}
+      {frameId === "cny_golden_rat" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-red-500 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.9)]" />
+        </>
+      )}
+      {frameId === "cny_fortune_cat" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-yellow-400 via-amber-300 to-red-500 opacity-95 blur-[4.5px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-300 shadow-[0_0_10px_rgba(250,204,21,0.9)]" />
+        </>
+      )}
+      {frameId === "cny_red_packet" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-red-600 via-amber-400 to-red-600 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-400 shadow-[0_0_10px_rgba(239,68,68,0.95)]" />
+        </>
+      )}
+      {frameId === "songkran_water_splash" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-sky-300 shadow-[0_0_10px_rgba(56,189,248,0.9)]" />
+        </>
+      )}
+      {frameId === "mid_autumn_mooncake" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-500 opacity-90 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-200 shadow-[0_0_9px_rgba(252,211,77,0.85)]" />
+        </>
+      )}
+      {frameId === "halloween_ghost_flame" && (
+        <>
+          <div className="absolute -inset-[4.5px] rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-purple-600 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
+        </>
+      )}
+
+      {/* ── Sci-Fi & Cyberpunk ── */}
       {frameId === "valentines_cupid" && (
         <>
           <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-rose-500 via-pink-400 to-red-400 opacity-90 blur-[4.5px] animate-pulse" />

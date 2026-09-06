@@ -1,6 +1,6 @@
 {
   "name": "autocommitpush",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "type": "module",
   "description": "AutoCommitPush - Git automation desktop app",
   "scripts": {
