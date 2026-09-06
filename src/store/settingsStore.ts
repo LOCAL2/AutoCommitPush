@@ -61,7 +61,7 @@ export const useSettingsStore = create<SettingsState>()(
       theme: "dark" as ThemePreset,
       accentColor: "default",
       bgImageUrl: "",
-      bgOpacity: 0.25,
+      bgOpacity: 0.05,
       launchOnStartup: false,
       authorName: "",
       authorEmail: "",
