@@ -397,7 +397,7 @@ function LocalTab() {
           const { status } = cs;
 
           return (
-            <Card key={project.id} className="card-hover-effect transition-all">
+            <Card key={project.id}>
               <CardContent className="p-4">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3">
