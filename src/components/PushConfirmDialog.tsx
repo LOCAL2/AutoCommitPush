@@ -83,39 +83,47 @@ export default function PushConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="w-full max-w-2xl rounded-xl border bg-card shadow-xl p-6 max-h-[90vh] overflow-y-auto min-h-[220px]">
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="w-full max-w-lg rounded-2xl border border-border/80 bg-card shadow-2xl overflow-hidden animate-none">
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <UploadCloud className="h-5 w-5 text-github-green" />
-            <h2 className="font-semibold">Confirm Push</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b bg-muted/20">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-github-green/15 text-github-green border border-github-green/20 shrink-0">
+              <UploadCloud className="h-4.5 w-4.5" />
+            </div>
+            <h2 className="font-semibold text-base text-foreground">Confirm Push</h2>
           </div>
-          <button onClick={onCancel}
-            className="text-muted-foreground hover:text-foreground transition-colors">
-            <X className="h-5 w-5" />
+          <button
+            onClick={onCancel}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted/50"
+          >
+            <X className="h-4.5 w-4.5" />
           </button>
         </div>
 
-        <div className="space-y-4">
-          {/* Branch + Remote */}
-          <div className="rounded-lg bg-muted/40 p-3 space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <GitBranch className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground">Branch:</span>
-              <span className="font-mono font-medium text-primary">{branch}</span>
+        <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+          {/* Branch & Remote Info */}
+          <div className="rounded-xl border bg-muted/30 p-3.5 space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <GitBranch className="h-3.5 w-3.5 shrink-0" />
+                <span>Target Branch</span>
+              </div>
+              <span className="font-mono font-semibold text-foreground px-2 py-0.5 rounded bg-primary/10 border border-primary/20">{branch}</span>
             </div>
-            <div className="flex items-start gap-2">
-              <Globe className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
-              <span className="text-muted-foreground shrink-0">Remote:</span>
-              <span className="font-mono text-xs break-all">{remote}</span>
+            <div className="flex items-start justify-between gap-4 pt-1 border-t border-border/40">
+              <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+                <Globe className="h-3.5 w-3.5 shrink-0" />
+                <span>Remote Repository</span>
+              </div>
+              <span className="font-mono text-[11px] text-muted-foreground break-all text-right max-w-[240px] truncate">{remote}</span>
             </div>
           </div>
 
           {/* No remote warning */}
           {!status.remote_url && (
-            <div className="flex items-center gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-xs text-destructive">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs text-destructive">
               <AlertCircle className="h-4 w-4 shrink-0" />
               No remote repository configured. Push will fail.
             </div>
@@ -131,97 +139,99 @@ export default function PushConfirmDialog({
           )}
 
           {totalChanges === 0 && (
-            <div className="flex items-center gap-2 p-3 rounded-md bg-muted/50 border border-border text-xs text-muted-foreground">
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              No local changes detected. Nothing to commit or push.
+            <div className="flex items-center gap-2.5 p-4 rounded-xl bg-muted/40 border border-border/80 text-xs text-muted-foreground">
+              <AlertCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span>No local changes detected in this repository. Nothing to commit or push.</span>
             </div>
           )}
 
-          {/* ── Commit Message — hide if no changes ── */}
+          {/* Commit Message (Only if changes exist) */}
           {totalChanges > 0 && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Commit Message</label>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={isGeneratingAi}
-                  onClick={handleAiGenerate}
-                  className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 transition-colors font-medium"
-                >
-                  {isGeneratingAi ? (
-                    <>
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      Generating AI...
-                    </>
-                  ) : (
-                    <>
-                      <Bot className="h-3.5 w-3.5" />
-                      AI Generate
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCommitMsg(generateCommitMessage(status, diffCache))}
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Sparkles className="h-3 w-3" />
-                  Auto
-                </button>
-              </div>
-            </div>
-
-            <Input
-              value={commitMsg}
-              onChange={(e) => setCommitMsg(e.target.value)}
-              placeholder="Describe your changes..."
-              className="text-sm font-mono"
-            />
-
-            {/* Suggestions dropdown */}
-            <button
-              onClick={() => setShowSuggestions(!showSuggestions)}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ChevronDown className={`h-3 w-3 transition-transform ${showSuggestions ? "rotate-180" : ""}`} />
-              Suggestions
-            </button>
-
-            {showSuggestions && (
-              <div className="rounded-md border divide-y divide-border bg-card animate-fade-in">
-                {suggestions.map((s) => (
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">Commit Message</label>
+                <div className="flex items-center gap-2">
                   <button
-                    key={s}
-                    onClick={() => { setCommitMsg(s); setShowSuggestions(false); }}
-                    className={`w-full text-left px-3 py-2 text-xs font-mono hover:bg-muted/50 transition-colors ${
-                      s === commitMsg ? "bg-primary/10 text-primary" : ""
-                    }`}
+                    type="button"
+                    disabled={isGeneratingAi}
+                    onClick={handleAiGenerate}
+                    className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 transition-colors font-medium"
                   >
-                    {s}
+                    {isGeneratingAi ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Generating AI...
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="h-3 w-3" />
+                        AI Generate
+                      </>
+                    )}
                   </button>
-                ))}
+                  <button
+                    type="button"
+                    onClick={() => setCommitMsg(generateCommitMessage(status, diffCache))}
+                    className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    Auto
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-          )}
 
-          {/* Actions */}
-          <div className="flex gap-2 pt-1">
-            <Button variant="outline" onClick={onCancel} className="flex-1">
-              Cancel
-            </Button>
-            <Button
-              variant="success"
-              onClick={() => onConfirm(commitMsg.trim() || defaultCommitMessage)}
-              disabled={!status.remote_url || !commitMsg.trim() || totalChanges === 0}
-              className="flex-1"
-            >
-              <UploadCloud className="h-4 w-4" />
-              Push to {branch}
-            </Button>
-          </div>
+              <Input
+                value={commitMsg}
+                onChange={(e) => setCommitMsg(e.target.value)}
+                placeholder="Describe your changes..."
+                className="text-xs font-mono"
+              />
+
+              {/* Suggestions dropdown */}
+              <button
+                onClick={() => setShowSuggestions(!showSuggestions)}
+                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors pt-0.5"
+              >
+                <ChevronDown className={`h-3 w-3 transition-transform ${showSuggestions ? "rotate-180" : ""}`} />
+                Suggestions
+              </button>
+
+              {showSuggestions && (
+                <div className="rounded-lg border divide-y divide-border bg-card">
+                  {suggestions.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => { setCommitMsg(s); setShowSuggestions(false); }}
+                      className={`w-full text-left px-3 py-1.5 text-xs font-mono hover:bg-muted/50 transition-colors ${
+                        s === commitMsg ? "bg-primary/10 text-primary" : ""
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
+        {/* Footer Actions */}
+        <div className="flex gap-2.5 px-5 py-3.5 border-t bg-muted/20">
+          <Button variant="outline" size="sm" onClick={onCancel} className="flex-1 rounded-xl">
+            Cancel
+          </Button>
+          <Button
+            variant="success"
+            size="sm"
+            onClick={() => onConfirm(commitMsg.trim() || defaultCommitMessage)}
+            disabled={!status.remote_url || !commitMsg.trim() || totalChanges === 0}
+            className="flex-1 rounded-xl"
+          >
+            <UploadCloud className="h-4 w-4" />
+            Push to {branch}
+          </Button>
+        </div>
+
       </div>
     </div>
   );
