@@ -90,25 +90,27 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Live Profile Header Banner */}
-            <div className="flex items-center justify-between p-4 rounded-xl border bg-gradient-to-r from-card via-muted/40 to-card">
-              <div className="flex items-center gap-4">
-                <AvatarWithFrame
-                  src={user.avatar_url}
-                  alt={user.login}
-                  size="xl"
-                  frameId={avatarFrame}
-                />
-                <div>
-                  <p className="font-bold text-base">
+            <div className="flex items-center justify-between p-6 rounded-2xl border bg-gradient-to-r from-card via-muted/30 to-card shadow-xs gap-4 overflow-hidden">
+              <div className="flex items-center gap-5 min-w-0 flex-1">
+                <div className="shrink-0 p-1">
+                  <AvatarWithFrame
+                    src={user.avatar_url}
+                    alt={user.login}
+                    size="xl"
+                    frameId={avatarFrame}
+                  />
+                </div>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="font-bold text-base truncate leading-snug">
                     <NameEffect text={user.name ?? user.login} effectId={nameEffect} />
-                  </p>
-                  <p className="text-xs text-muted-foreground">@{user.login}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate font-mono">@{user.login}</p>
                 </div>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                className="text-destructive hover:text-destructive shrink-0"
+                className="text-destructive hover:text-destructive shrink-0 ml-2"
                 onClick={async () => { await logout(); showToast("info", "Logged out"); }}
               >
                 <LogOut className="h-4 w-4" /> Sign Out
@@ -187,7 +189,7 @@ export default function SettingsPage() {
 
               {/* Tab 1: Avatar Frames Grid */}
               {activeCustomTab === "frames" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-[280px] overflow-y-auto pr-1">
                   {AVATAR_FRAMES.filter((f) => frameCategory === "All" || f.category === frameCategory).map((frame) => {
                     const isSelected = avatarFrame === frame.id;
                     return (
@@ -199,9 +201,9 @@ export default function SettingsPage() {
                           showToast("success", `Frame: ${frame.name}`);
                         }}
                         className={cn(
-                          "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                          "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group select-none",
                           isSelected
-                            ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
+                            ? "border-primary bg-primary/10 ring-1 ring-primary shadow-xs"
                             : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
                         )}
                       >
@@ -226,7 +228,7 @@ export default function SettingsPage() {
 
               {/* Tab 2: Name Effects Grid */}
               {activeCustomTab === "name_effects" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-[280px] overflow-y-auto pr-1">
                   {NAME_EFFECTS.filter((e) => effectCategory === "All" || e.category === effectCategory).map((effect) => {
                     const isSelected = nameEffect === effect.id;
                     return (
@@ -238,9 +240,9 @@ export default function SettingsPage() {
                           showToast("success", `Name Effect: ${effect.name}`);
                         }}
                         className={cn(
-                          "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                          "flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group select-none",
                           isSelected
-                            ? "border-primary bg-primary/10 ring-1 ring-primary shadow-sm"
+                            ? "border-primary bg-primary/10 ring-1 ring-primary shadow-xs"
                             : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
                         )}
                       >
@@ -408,17 +410,41 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between py-1">
             <div>
               <p className="text-sm font-medium">Check for Updates</p>
-              <p className="text-xs text-muted-foreground">Fetch latest releases from GitHub server</p>
+              <p className="text-xs text-muted-foreground">Auto-download and silent update in background</p>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={async () => {
                 try {
-                  const { invoke } = await import("@tauri-apps/api/core");
-                  await invoke("plugin:shell|open", { path: "https://github.com/LOCAL2/AutoCommitPush/releases" });
-                } catch {
-                  window.open("https://github.com/LOCAL2/AutoCommitPush/releases", "_blank");
+                  showToast("info", "Checking for latest release...");
+                  const res = await fetch("https://api.github.com/repos/LOCAL2/AutoCommitPush/releases/latest");
+                  if (!res.ok) throw new Error("Could not fetch release info");
+                  const data = await res.json();
+                  const latestVersion = data.tag_name ? data.tag_name.replace(/^v/, "") : null;
+                  
+                  if (latestVersion && appVersion && latestVersion !== appVersion) {
+                    // Find setup exe asset url
+                    const exeAsset = data.assets?.find((a: any) => a.name.endsWith(".exe"));
+                    const downloadUrl = exeAsset?.browser_download_url;
+
+                    if (downloadUrl) {
+                      showToast("info", `Downloading v${latestVersion} update in background...`);
+                      const { invoke } = await import("@tauri-apps/api/core");
+                      await invoke("install_update_silently", {
+                        downloadUrl,
+                        version: latestVersion,
+                      });
+                      showToast("success", `v${latestVersion} installed! Please restart the app to apply update.`);
+                    } else {
+                      const { invoke } = await import("@tauri-apps/api/core");
+                      await invoke("plugin:shell|open", { path: data.html_url || "https://github.com/LOCAL2/AutoCommitPush/releases" });
+                    }
+                  } else {
+                    showToast("success", `You are on the latest version (v${appVersion || latestVersion}).`);
+                  }
+                } catch (err: any) {
+                  showToast("error", `Update check failed: ${err.message || String(err)}`);
                 }
               }}
             >

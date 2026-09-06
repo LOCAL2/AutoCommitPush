@@ -266,8 +266,13 @@ export const AvatarWithFrame: React.FC<AvatarWithFrameProps> = ({
 
       {frameId === "cyber_glitch" && (
         <>
-          <div className="absolute -inset-[3px] rounded-full bg-gradient-to-r from-red-500 via-cyan-400 to-green-400 opacity-80 animate-[bounce_1.5s_infinite]" />
-          <div className="absolute -inset-[1.5px] rounded-full border border-white/80" />
+          {/* Cyberpunk Neo-Glitch Hexagonal Matrix Aura */}
+          <div className="absolute -inset-[5px] rounded-full bg-gradient-to-tr from-cyan-500 via-fuchsia-500 to-emerald-400 opacity-90 blur-[3px] animate-pulse" />
+          <div className="absolute -inset-[3px] rounded-full border-2 border-cyan-400/90 shadow-[0_0_12px_rgba(6,182,212,0.8),inset_0_0_8px_rgba(217,70,239,0.5)] animate-cyber-glitch" />
+          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-cyan-400 rounded-sm shadow-[0_0_6px_#22d3ee] animate-ping" />
+          <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 bg-fuchsia-500 rounded-sm shadow-[0_0_6px_#d946ef] animate-pulse" />
+          <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-1 h-3 bg-emerald-400 rounded-xs shadow-[0_0_6px_#34d399]" />
+          <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-1 h-3 bg-cyan-400 rounded-xs shadow-[0_0_6px_#22d3ee]" />
         </>
       )}
 

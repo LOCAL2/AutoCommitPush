@@ -4,3 +4,4 @@ pub mod git;
 pub mod github;
 pub mod terminal;
 pub mod setup;
+pub mod updater;

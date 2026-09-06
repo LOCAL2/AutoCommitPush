@@ -327,3 +327,16 @@
 .prose th { padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; }
 .prose td { padding: 0.5rem 0.75rem; border-bottom: 1px solid hsl(var(--border)); }
 .prose tbody tr:hover { background: hsl(var(--secondary) / 0.5); }
+
+/* ── Cyber Glitch Animation ── */
+@keyframes cyber-glitch-skew {
+  0%, 100% { transform: skew(0deg); }
+  20% { transform: skew(-4deg) scale(1.02); }
+  40% { transform: skew(3deg) translate(-1px, 1px); }
+  60% { transform: skew(-2deg) translate(1px, -1px); }
+  80% { transform: skew(1deg); }
+}
+.animate-cyber-glitch {
+  animation: cyber-glitch-skew 2s infinite ease-in-out;
+}
+

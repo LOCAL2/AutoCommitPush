@@ -64,6 +64,7 @@ pub fn run() {
             commands::terminal::docker_push,
             commands::setup::run_setup_checks,
             commands::setup::check_single,
+            commands::updater::install_update_silently,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

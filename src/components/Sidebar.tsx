@@ -75,20 +75,26 @@ export default function Sidebar() {
       {/* User */}
       {user && (
         <div className="p-3 border-t">
-          <div className="flex items-center gap-2.5">
-            <AvatarWithFrame
-              src={user.avatar_url}
-              alt={user.login}
-              size="sm"
-              frameId={avatarFrame}
-            />
-            <div className="min-w-0">
+          <NavLink
+            to="/settings"
+            className="flex items-center gap-2.5 p-1.5 -m-1.5 rounded-xl hover:bg-muted/60 transition-all group/sidebarAvatar"
+            title="Click to customize profile settings"
+          >
+            <div className="relative">
+              <AvatarWithFrame
+                src={user.avatar_url}
+                alt={user.login}
+                size="sm"
+                frameId={avatarFrame}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-medium truncate">
                 <NameEffect text={user.name ?? user.login} effectId={nameEffect} />
               </p>
-              <p className="text-xs text-muted-foreground truncate">@{user.login}</p>
+              <p className="text-[11px] text-muted-foreground truncate">@{user.login}</p>
             </div>
-          </div>
+          </NavLink>
         </div>
       )}
     </aside>
