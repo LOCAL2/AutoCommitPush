@@ -180,16 +180,28 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
-            <Monitor className="h-4 w-4" /> App Updates
+            <Monitor className="h-4 w-4 text-primary" /> Application Updates
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
+        <CardContent className="space-y-4">
+          {/* Installed Version Row */}
+          <div className="flex items-center justify-between py-1">
+            <div>
+              <p className="text-sm font-medium">Installed Version</p>
+              <p className="text-xs text-muted-foreground">Currently running version of AutoCommitPush</p>
+            </div>
+            <span className="text-xs font-mono font-semibold bg-primary/10 text-primary border border-primary/20 px-2.5 py-1 rounded-md">
+              {appVersion ? `v${appVersion}` : "..."}
+            </span>
+          </div>
+
+          <div className="border-t border-border/50" />
+
+          {/* Check for Updates Row */}
+          <div className="flex items-center justify-between py-1">
             <div>
               <p className="text-sm font-medium">Check for Updates</p>
-              <p className="text-xs text-muted-foreground">
-                Current Version: <span className="font-mono text-foreground font-semibold">{appVersion ? `v${appVersion}` : "..."}</span>
-              </p>
+              <p className="text-xs text-muted-foreground">Fetch latest releases from GitHub server</p>
             </div>
             <Button
               variant="outline"
