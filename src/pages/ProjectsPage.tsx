@@ -251,7 +251,7 @@ function LocalTab() {
   };
 
   // Step 1: show confirm dialog
-  const handlePush = (id: string, _path: string, _label: string) => {
+  const handlePush = async (id: string, path: string, _label: string) => {
     if (!token) { showToast("error", "Not logged in"); return; }
     const cs = cardStates[id];
     if (!cs?.status?.is_git_repo) { showToast("warning", "Not a git repo"); return; }
@@ -260,7 +260,13 @@ function LocalTab() {
       showToast("error", "Git Author name and email are required. Please fill them in Settings first.");
       return;
     }
-    setCardState(id, { showPushConfirm: true });
+    // Fetch latest status first so dialog opens with accurate updated status
+    try {
+      const freshStatus = await cmd.getRepoStatus(path);
+      setCardState(id, { status: freshStatus, showPushConfirm: true });
+    } catch {
+      setCardState(id, { showPushConfirm: true });
+    }
   };
 
   const handlePull = (id: string, _path: string, _label: string) => {
