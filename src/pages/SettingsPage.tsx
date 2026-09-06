@@ -639,42 +639,25 @@ export default function SettingsPage() {
                   variant="outline"
                   size="sm"
                   className="shrink-0 text-xs gap-1.5"
-                  onClick={async () => {
-                    try {
-                      const { open } = await import("@tauri-apps/plugin-dialog");
-                      const selected = await open({
-                        multiple: false,
-                        filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "gif"] }],
-                      });
-                      if (selected && typeof selected === "string") {
-                        const fileUrl = selected.startsWith("file://")
-                          ? selected
-                          : `file:///${selected.replace(/\\/g, "/")}`;
-                        settings.setBgImageUrl(fileUrl);
-                        flashSaved();
-                        showToast("success", "Background image selected!");
+                  onClick={() => {
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = "image/*";
+                    input.onchange = (e: any) => {
+                      const file = e.target?.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (re) => {
+                          if (re.target?.result) {
+                            settings.setBgImageUrl(re.target.result as string);
+                            flashSaved();
+                            showToast("success", "Background image loaded successfully!");
+                          }
+                        };
+                        reader.readAsDataURL(file);
                       }
-                    } catch (err: any) {
-                      // Fallback HTML file picker if plugin-dialog is not active
-                      const input = document.createElement("input");
-                      input.type = "file";
-                      input.accept = "image/*";
-                      input.onchange = (e: any) => {
-                        const file = e.target?.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (re) => {
-                            if (re.target?.result) {
-                              settings.setBgImageUrl(re.target.result as string);
-                              flashSaved();
-                              showToast("success", "Background image loaded!");
-                            }
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      };
-                      input.click();
-                    }
+                    };
+                    input.click();
                   }}
                 >
                   <Upload className="h-3.5 w-3.5" /> Choose File
