@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { AlertTriangle, X, Trash2, Github, AlertCircle } from "lucide-react";
+import { AlertTriangle, X, Trash2, Github, AlertCircle, ShieldAlert, FolderMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Props {
   projectLabel: string;
@@ -28,7 +29,6 @@ export default function RemoveProjectDialog({
   const hasGitHubRepo = !!repoFullName;
 
   const handleConfirm = async () => {
-    // If user wants to delete GitHub repo → show second confirmation
     if (deleteGitHub && step === "confirm") {
       setStep("confirm-github");
       return;
@@ -45,119 +45,146 @@ export default function RemoveProjectDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-xl border bg-card shadow-xl animate-fade-in p-6">
-
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-md animate-fade-in p-4">
+      <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card shadow-2xl animate-scale-up overflow-hidden">
+        
+        {/* Top Header Banner */}
+        <div className="flex items-center justify-between px-5 py-4 border-b bg-muted/30">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-destructive/15 shrink-0">
-              <Trash2 className="h-5 w-5 text-destructive" />
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-destructive/15 text-destructive border border-destructive/20 shrink-0">
+              {step === "confirm-github" ? <ShieldAlert className="h-5 w-5" /> : <FolderMinus className="h-5 w-5" />}
             </div>
-            <h2 className="font-semibold">
-              {step === "confirm-github" ? "Delete GitHub Repository?" : "Remove Project"}
-            </h2>
+            <div>
+              <h2 className="font-semibold text-sm leading-tight text-foreground">
+                {step === "confirm-github" ? "Delete GitHub Repository" : "Remove Project"}
+              </h2>
+              <p className="text-[11px] text-muted-foreground">
+                {step === "confirm-github" ? "Permanent cloud action" : "Unlink project from AutoCommitPush"}
+              </p>
+            </div>
           </div>
-          <button onClick={onCancel} disabled={loading}
-            className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors disabled:opacity-40"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Step 1 — main confirm */}
-        {step === "confirm" && (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground pl-12 leading-relaxed">
-              Remove <span className="font-medium text-foreground">"{projectLabel}"</span> from AutoCommitPush?
-              This clears all saved settings and history.{" "}
-              <span className="text-muted-foreground/70">Files on disk are not affected.</span>
-            </p>
+        <div className="p-5 space-y-4">
+          {/* Step 1 — Main Confirm */}
+          {step === "confirm" && (
+            <div className="space-y-4">
+              <div className="p-3.5 rounded-xl border bg-muted/20 space-y-1">
+                <p className="text-xs text-muted-foreground">Target Project</p>
+                <p className="text-sm font-semibold text-foreground truncate">{projectLabel}</p>
+              </div>
 
-            {/* GitHub delete option */}
-            {hasGitHubRepo && (
-              <label className="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/40 transition-colors select-none">
-                <input
-                  type="checkbox"
-                  checked={deleteGitHub}
-                  onChange={(e) => setDeleteGitHub(e.target.checked)}
-                  className="mt-0.5 accent-destructive h-4 w-4 shrink-0"
-                />
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-1.5 text-sm font-medium">
-                    <Github className="h-3.5 w-3.5 text-muted-foreground" />
-                    Also delete GitHub repository
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Removing this project clears all local tracking history and app preferences.{" "}
+                <span className="text-foreground font-medium">Your source files on disk will not be touched or deleted.</span>
+              </p>
+
+              {/* GitHub delete option */}
+              {hasGitHubRepo && (
+                <div
+                  onClick={() => !loading && setDeleteGitHub(!deleteGitHub)}
+                  className={cn(
+                    "flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all select-none group",
+                    deleteGitHub
+                      ? "border-destructive/60 bg-destructive/10 ring-1 ring-destructive/40 shadow-xs"
+                      : "border-border/80 bg-background hover:bg-muted/40 hover:border-border"
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    checked={deleteGitHub}
+                    onChange={(e) => setDeleteGitHub(e.target.checked)}
+                    className="mt-0.5 accent-destructive h-4 w-4 shrink-0 rounded cursor-pointer"
+                  />
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                      <Github className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span>Also delete remote GitHub repository</span>
+                    </div>
+                    <p className="text-[11px] text-destructive font-mono truncate font-medium">
+                      {repoFullName}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-normal">
+                      Permanently destroys remote code and branches on GitHub.
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground font-mono">
-                    {repoFullName}
+                </div>
+              )}
+
+              {error && (
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-destructive/10 border border-destructive/30 text-xs text-destructive">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                <Button variant="ghost" size="sm" onClick={onCancel} disabled={loading} className="text-xs h-8">
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleConfirm}
+                  loading={loading}
+                  className="text-xs h-8 px-4 font-medium shadow-sm"
+                >
+                  {deleteGitHub ? "Next: Confirm GitHub Delete →" : "Remove Project"}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2 — Final GitHub delete confirmation */}
+          {step === "confirm-github" && (
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive">
+                <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-wider">Warning: Destruction Danger</p>
+                  <p className="text-xs leading-relaxed text-destructive/90">
+                    Deleting <span className="font-mono font-bold text-destructive underline">{repoFullName}</span> will permanently erase all remote code, commit history, pull requests, and releases on GitHub.
                   </p>
                 </div>
-              </label>
-            )}
-
-            {error && (
-              <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-xs text-destructive">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                {error}
               </div>
-            )}
 
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" size="sm" onClick={onCancel} disabled={loading}>
-                Cancel
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={handleConfirm}
-                loading={loading}
-              >
-                {deleteGitHub ? "Next →" : "Remove"}
-              </Button>
-            </div>
-          </div>
-        )}
+              <p className="text-xs text-muted-foreground">
+                Are you 100% sure you want to proceed with permanent deletion?
+              </p>
 
-        {/* Step 2 — final GitHub delete confirmation */}
-        {step === "confirm-github" && (
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
-              <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-destructive">This cannot be undone</p>
-                <p className="text-xs text-muted-foreground">
-                  Deleting <span className="font-mono font-medium">{repoFullName}</span> will permanently
-                  remove all code, commits, issues, pull requests, and settings from GitHub.
-                </p>
+              {error && (
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-destructive/10 border border-destructive/30 text-xs text-destructive">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                <Button variant="outline" size="sm" onClick={() => setStep("confirm")} disabled={loading} className="text-xs h-8">
+                  ← Back
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleConfirm}
+                  loading={loading}
+                  className="text-xs h-8 px-4 font-bold shadow-sm flex items-center gap-1.5"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Permanently Delete Repository
+                </Button>
               </div>
             </div>
-
-            <p className="text-sm text-muted-foreground">
-              Are you absolutely sure you want to delete this repository?
-            </p>
-
-            {error && (
-              <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-xs text-destructive">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                {error}
-              </div>
-            )}
-
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" size="sm" onClick={() => setStep("confirm")} disabled={loading}>
-                Back
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={handleConfirm}
-                loading={loading}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Delete Repository
-              </Button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
