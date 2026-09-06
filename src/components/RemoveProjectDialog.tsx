@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, X, Trash2, Github, AlertCircle, ShieldAlert, FolderMinus } from "lucide-react";
+import { AlertTriangle, X, Trash2, Github, AlertCircle, ShieldAlert, FolderMinus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -98,12 +98,18 @@ export default function RemoveProjectDialog({
                       : "border-border/80 bg-background hover:bg-muted/40 hover:border-border"
                   )}
                 >
-                  <input
-                    type="checkbox"
-                    checked={deleteGitHub}
-                    onChange={(e) => setDeleteGitHub(e.target.checked)}
-                    className="mt-0.5 accent-destructive h-4 w-4 shrink-0 rounded cursor-pointer"
-                  />
+                  {/* Custom Theme-Adaptive Checkbox */}
+                  <div
+                    className={cn(
+                      "mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all duration-200",
+                      deleteGitHub
+                        ? "bg-destructive border-destructive text-destructive-foreground shadow-xs scale-105"
+                        : "border-muted-foreground/40 bg-muted/20 group-hover:border-muted-foreground/80"
+                    )}
+                  >
+                    {deleteGitHub && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
                       <Github className="h-4 w-4 text-muted-foreground shrink-0" />
