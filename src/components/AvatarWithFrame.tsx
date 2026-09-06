@@ -22,12 +22,15 @@ export type AvatarFrameId =
   // Aesthetic & Modern (13)
   | "synthwave_sun" | "vaporwave_pink" | "prism_chroma" | "neon_gradient" | "holographic_foil"
   | "minimal_white" | "sunset_glow" | "pastel_candy" | "cyber_lime" | "monochrome_luxe"
-  | "gradient_wave" | "electric_cyan" | "retro_arcade";
+  | "gradient_wave" | "electric_cyan" | "retro_arcade"
+  // Seasonal & Festival (8)
+  | "valentines_cupid" | "chinese_cny_dragon" | "halloween_pumpkin" | "christmas_snow"
+  | "cyber_valentine" | "cny_red_lantern" | "sakura_romantic" | "golden_firecracker";
 
 export interface AvatarFrameOption {
   id: AvatarFrameId;
   name: string;
-  category: "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic";
+  category: "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic" | "Seasonal";
   description: string;
 }
 
@@ -108,6 +111,16 @@ export const AVATAR_FRAMES: AvatarFrameOption[] = [
   { id: "gradient_wave", name: "Fluid Gradient Wave", category: "Aesthetic", description: "คลื่นเกรเดียนท์สีสดใสไหลละมุน" },
   { id: "electric_cyan", name: "Electric Cyan Pulse", category: "Aesthetic", description: "ฟ้าไซอันกระแสไฟฟ้าเรืองแสง" },
   { id: "retro_arcade", name: "Retro Pixel Arcade", category: "Aesthetic", description: "พิกเซลเกมตู้อาร์เคดยุค 90s" },
+
+  // Seasonal & Festival (8)
+  { id: "valentines_cupid", name: "Valentine Heart Cupid", category: "Seasonal", description: "ออร่าหัวใจกามเทพคิวปิดวาเลนไทน์ชมพูเรืองแสง" },
+  { id: "chinese_cny_dragon", name: "CNY Imperial Red Dragon", category: "Seasonal", description: "มังกรทองตรุษจีนมงคลแดงทองมหาเฮง" },
+  { id: "cny_red_lantern", name: "CNY Red Lantern Gold", category: "Seasonal", description: "โคมไฟแดงตรุษจีนรัศมีทองคำโชคลาภ" },
+  { id: "golden_firecracker", name: "CNY Golden Firecracker", category: "Seasonal", description: "ประทัดมงคลทองคำต้อนรับปีใหม่จีน" },
+  { id: "cyber_valentine", name: "Cyberpunk Pink Neon Heart", category: "Seasonal", description: "หัวใจนีออนชมพูไซเบอร์พังค์อนาคต" },
+  { id: "sakura_romantic", name: "Romantic Sakura Love", category: "Seasonal", description: "กลีบซากุระแห่งความรักหวานละมุน" },
+  { id: "halloween_pumpkin", name: "Halloween Spooky Pumpkin", category: "Seasonal", description: "ฟักทองฮาโลวีนส้มดำลึกลับประดับออร่า" },
+  { id: "christmas_snow", name: "Merry Christmas Blizzard", category: "Seasonal", description: "คริสต์มาสหิมะโปรยปรายละอองทองมงคล" },
 ];
 
 interface AvatarWithFrameProps {
@@ -590,6 +603,56 @@ export const AvatarWithFrame: React.FC<AvatarWithFrameProps> = ({
         <>
           <div className="absolute -inset-[3.5px] rounded-full border-2 border-dashed border-amber-400 animate-[spin_6s_linear_infinite]" />
           <div className="absolute -inset-[1.5px] rounded-full border border-pink-500" />
+        </>
+      )}
+
+      {/* ── Seasonal & Festival (8) ── */}
+      {frameId === "valentines_cupid" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-rose-500 via-pink-400 to-red-400 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.9)]" />
+        </>
+      )}
+      {frameId === "chinese_cny_dragon" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-red-600 via-amber-400 to-yellow-300 opacity-95 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-amber-300 shadow-[0_0_10px_rgba(234,179,8,0.95)]" />
+        </>
+      )}
+      {frameId === "cny_red_lantern" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-t from-red-700 via-amber-500 to-yellow-200 opacity-90 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-amber-300 shadow-[0_0_8px_rgba(239,68,68,0.85)]" />
+        </>
+      )}
+      {frameId === "golden_firecracker" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-red-600 via-yellow-400 to-amber-500 opacity-90 blur-[4px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-dashed border-amber-300 animate-[spin_8s_linear_infinite]" />
+        </>
+      )}
+      {frameId === "cyber_valentine" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-fuchsia-500 via-pink-400 to-cyan-400 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-pink-300 shadow-[0_0_10px_rgba(236,72,153,0.9)]" />
+        </>
+      )}
+      {frameId === "sakura_romantic" && (
+        <>
+          <div className="absolute -inset-[3.5px] rounded-full bg-gradient-to-r from-pink-300 via-rose-200 to-pink-400 opacity-85 blur-[4px]" />
+          <div className="absolute -inset-[1.5px] rounded-full border border-pink-200 shadow-[0_0_7px_rgba(244,114,182,0.8)]" />
+        </>
+      )}
+      {frameId === "halloween_pumpkin" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-orange-600 via-amber-500 to-purple-800 opacity-90 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-orange-400 shadow-[0_0_9px_rgba(249,115,22,0.9)]" />
+        </>
+      )}
+      {frameId === "christmas_snow" && (
+        <>
+          <div className="absolute -inset-[4px] rounded-full bg-gradient-to-r from-emerald-500 via-white to-red-500 opacity-85 blur-[4.5px] animate-pulse" />
+          <div className="absolute -inset-[1.5px] rounded-full border-2 border-white/90 shadow-[0_0_9px_rgba(255,255,255,0.9)]" />
         </>
       )}
 

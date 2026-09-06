@@ -37,8 +37,8 @@ export default function SettingsPage() {
   const settings = useSettingsStore();
   const { avatarFrame, setAvatarFrame, nameEffect, setNameEffect } = useSettingsStore();
   const [activeCustomTab, setActiveCustomTab] = useState<"frames" | "name_effects">("frames");
-  const [frameCategory, setFrameCategory] = useState<"All" | "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic">("All");
-  const [effectCategory, setEffectCategory] = useState<"All" | "Typing" | "Popular" | "Gaming" | "Luxury" | "Sci-Fi">("All");
+  const [frameCategory, setFrameCategory] = useState<"All" | "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic" | "Seasonal">("All");
+  const [effectCategory, setEffectCategory] = useState<"All" | "Typing" | "Popular" | "Gaming" | "Luxury" | "Sci-Fi" | "Seasonal">("All");
   const { user, logout } = useAuthStore();
   const { showToast } = useToast();
   const [appVersion, setAppVersion] = useState<string>("");
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                 {/* Category Filters depending on active tab */}
                 {activeCustomTab === "frames" ? (
                   <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                    {(["All", "Sci-Fi", "Fantasy", "Luxury", "Cosmic", "Aesthetic"] as const).map((cat) => (
+                    {(["All", "Seasonal", "Sci-Fi", "Fantasy", "Luxury", "Cosmic", "Aesthetic"] as const).map((cat) => (
                       <button
                         key={cat}
                         type="button"
@@ -172,7 +172,7 @@ export default function SettingsPage() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                    {(["All", "Typing", "Popular", "Gaming", "Luxury", "Sci-Fi"] as const).map((cat) => (
+                    {(["All", "Seasonal", "Typing", "Popular", "Gaming", "Luxury", "Sci-Fi"] as const).map((cat) => (
                       <button
                         key={cat}
                         type="button"

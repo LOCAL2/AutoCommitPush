@@ -25,12 +25,18 @@ export type NameEffectId =
   | "ocean_deep"
   | "ruby_flame"
   | "golden_laurel_text"
-  | "silver_chrome";
+  | "silver_chrome"
+  // Seasonal (5)
+  | "valentines_glow"
+  | "cny_dragon_gold"
+  | "cny_red_bless"
+  | "halloween_spooky"
+  | "christmas_jingle";
 
 export interface NameEffectOption {
   id: NameEffectId;
   name: string;
-  category: "Typing" | "Popular" | "Gaming" | "Luxury" | "Sci-Fi";
+  category: "Typing" | "Popular" | "Gaming" | "Luxury" | "Sci-Fi" | "Seasonal";
   description: string;
 }
 
@@ -40,7 +46,12 @@ export const NAME_EFFECTS: NameEffectOption[] = [
   // Typing Effect (1)
   { id: "typing_hacker", name: "Terminal Hacker Typing", category: "Typing", description: "แฮกเกอร์เทอร์มินัลพิมพ์ข้อความทีละตัวพร้อมเคอร์เซอร์กะพริบ" },
 
-  // Glowing & Animated Effects (20)
+  // Glowing & Animated Effects (25)
+  { id: "valentines_glow", name: "Valentine Heart Glow", category: "Seasonal", description: "หัวใจวาเลนไทน์สีชมพูอมแดงเรืองประกายหวานฉ่ำ" },
+  { id: "cny_dragon_gold", name: "CNY Imperial Dragon Gold", category: "Seasonal", description: "มังกรทองตรุษจีนเรืองแสงทองคำมหาเฮง" },
+  { id: "cny_red_bless", name: "CNY Ruby Fortune Red", category: "Seasonal", description: "สีแดงมงคลตรุษจีนประทัดโชคลาภมหาลาภ" },
+  { id: "halloween_spooky", name: "Halloween Pumpkin Glow", category: "Seasonal", description: "ฟักทองฮาโลวีนส้มอมม่วงเรืองแสงปีศาจ" },
+  { id: "christmas_jingle", name: "Christmas Festive Glow", category: "Seasonal", description: "คริสต์มาสตีมเขียวแดงหิมะเรืองประกาย" },
   { id: "rainbow_flow", name: "Rainbow Flow", category: "Popular", description: "เกรเดียนท์สายรุ้งเคลื่อนไหวพริ้วไหว" },
   { id: "neon_cyber", name: "Neon Cyber Glow", category: "Gaming", description: "นีออนสีฟ้า-ชมพูเรืองแสงสไตล์เกมเมอร์" },
   { id: "royal_gold", name: "Imperial Gold Shimmer", category: "Luxury", description: "ทองคำบริสุทธิ์สะท้อนแสงพรีเมียม" },
@@ -176,6 +187,16 @@ export const NameEffect: React.FC<NameEffectProps> = ({
       "bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 bg-clip-text text-transparent font-bold animate-pulse drop-shadow-[0_0_8px_rgba(250,204,21,0.9)]",
     silver_chrome:
       "bg-gradient-to-r from-slate-300 via-zinc-100 to-slate-400 bg-clip-text text-transparent font-bold drop-shadow-[0_0_6px_rgba(226,232,240,0.8)]",
+    valentines_glow:
+      "bg-gradient-to-r from-rose-500 via-pink-400 to-red-400 bg-clip-text text-transparent font-bold animate-pulse drop-shadow-[0_0_8px_rgba(244,63,94,0.9)]",
+    cny_dragon_gold:
+      "bg-gradient-to-r from-yellow-300 via-amber-300 to-yellow-500 bg-clip-text text-transparent font-bold animate-rainbow-flow drop-shadow-[0_0_9px_rgba(250,204,21,0.95)]",
+    cny_red_bless:
+      "bg-gradient-to-r from-red-600 via-rose-500 to-amber-400 bg-clip-text text-transparent font-bold drop-shadow-[0_0_8px_rgba(225,29,72,0.9)]",
+    halloween_spooky:
+      "bg-gradient-to-r from-orange-500 via-purple-400 to-amber-500 bg-clip-text text-transparent font-bold animate-pulse drop-shadow-[0_0_8px_rgba(249,115,22,0.9)]",
+    christmas_jingle:
+      "bg-gradient-to-r from-emerald-400 via-red-400 to-yellow-300 bg-clip-text text-transparent font-bold animate-pulse drop-shadow-[0_0_8px_rgba(52,211,153,0.9)]",
   };
 
   return (
