@@ -184,12 +184,28 @@
   @apply bg-muted-foreground/50;
 }
 
-/* Animations */
+/* Modal Dialog & Overlay Animations */
+.animate-dialog-overlay {
+  animation: overlayFadeIn 0.12s ease-out forwards;
+}
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-dialog-content {
+  animation: dialogPop 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes dialogPop {
+  0%   { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.15s ease-out;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(2px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -225,11 +241,11 @@
 }
 
 @keyframes scaleUp {
-  0% { opacity: 0; transform: scale(0.9); }
+  0% { opacity: 0; transform: scale(0.95); }
   100% { opacity: 1; transform: scale(1); }
 }
 .animate-scale-up {
-  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scaleUp 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Micro-interaction card hover & page transitions */

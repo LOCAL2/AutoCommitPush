@@ -45,8 +45,8 @@ export default function RemoveProjectDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-md animate-fade-in p-4">
-      <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card shadow-2xl animate-scale-up overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs animate-dialog-overlay p-4">
+      <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card shadow-2xl animate-dialog-content overflow-hidden">
         
         {/* Top Header Banner */}
         <div className="flex items-center justify-between px-5 py-4 border-b bg-muted/30">
