@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AppSettings, Theme } from "@/types";
+import type { AppSettings, ThemePreset, AccentColor } from "@/types";
 import type { AvatarFrameId } from "@/components/AvatarWithFrame";
 import type { NameEffectId } from "@/components/NameEffect";
 import { createTauriStorage } from "@/lib/tauriStorage";
@@ -8,6 +8,10 @@ import { createTauriStorage } from "@/lib/tauriStorage";
 interface SettingsState extends AppSettings {
   avatarFrame: AvatarFrameId;
   nameEffect: NameEffectId;
+  theme: ThemePreset;
+  accentColor: AccentColor;
+  bgImageUrl: string;
+  bgOpacity: number;
   // AI Settings
   aiProvider: "gemini" | "openai";
   geminiApiKey: string;
@@ -19,7 +23,11 @@ interface SettingsState extends AppSettings {
   dockerPassword: string;
   dockerDefaultTag: string;
   // Actions
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: ThemePreset) => void;
+  setAccentColor: (accent: AccentColor) => void;
+  setBgImageUrl: (url: string) => void;
+  setBgOpacity: (opacity: number) => void;
+  setAvatarFrame: (frame: AvatarFrameId) => void;
   setAvatarFrame: (frame: AvatarFrameId) => void;
   setNameEffect: (effect: NameEffectId) => void;
   setAiProvider: (provider: "gemini" | "openai") => void;
@@ -51,7 +59,10 @@ export const useSettingsStore = create<SettingsState>()(
       // Git / commit
       defaultCommitMessage: "Update project",
       defaultPrivate: false,
-      theme: "dark" as Theme,
+      theme: "dark" as ThemePreset,
+      accentColor: "default",
+      bgImageUrl: "",
+      bgOpacity: 0.25,
       launchOnStartup: false,
       authorName: "",
       authorEmail: "",
@@ -61,6 +72,9 @@ export const useSettingsStore = create<SettingsState>()(
       dockerDefaultTag: "latest",
 
       setTheme: (theme) => set({ theme }),
+      setAccentColor: (accentColor) => set({ accentColor }),
+      setBgImageUrl: (bgImageUrl) => set({ bgImageUrl }),
+      setBgOpacity: (bgOpacity) => set({ bgOpacity }),
       setAvatarFrame: (avatarFrame) => set({ avatarFrame }),
       setNameEffect: (nameEffect) => set({ nameEffect }),
       setAiProvider: (aiProvider) => set({ aiProvider }),

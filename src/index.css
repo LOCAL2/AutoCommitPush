@@ -47,6 +47,124 @@
     --input: 215 20% 18%;
     --ring: 213 94% 68%;
   }
+
+  /* Dracula Theme */
+  .theme-dracula {
+    --background: 244 24% 14%;
+    --foreground: 60 30% 96%;
+    --card: 244 20% 19%;
+    --card-foreground: 60 30% 96%;
+    --popover: 244 20% 19%;
+    --popover-foreground: 60 30% 96%;
+    --primary: 265 89% 78%;
+    --primary-foreground: 244 24% 14%;
+    --secondary: 244 15% 24%;
+    --secondary-foreground: 60 30% 96%;
+    --muted: 244 15% 24%;
+    --muted-foreground: 244 10% 65%;
+    --accent: 244 15% 24%;
+    --accent-foreground: 60 30% 96%;
+    --destructive: 0 100% 67%;
+    --border: 244 15% 26%;
+    --input: 244 15% 26%;
+    --ring: 265 89% 78%;
+  }
+
+  /* Nord Theme */
+  .theme-nord {
+    --background: 220 16% 22%;
+    --foreground: 218 27% 92%;
+    --card: 220 16% 28%;
+    --card-foreground: 218 27% 92%;
+    --popover: 220 16% 28%;
+    --popover-foreground: 218 27% 92%;
+    --primary: 193 43% 67%;
+    --primary-foreground: 220 16% 22%;
+    --secondary: 220 16% 32%;
+    --secondary-foreground: 218 27% 92%;
+    --muted: 220 16% 32%;
+    --muted-foreground: 220 10% 70%;
+    --accent: 220 16% 32%;
+    --accent-foreground: 218 27% 92%;
+    --destructive: 354 70% 54%;
+    --border: 220 16% 34%;
+    --input: 220 16% 34%;
+    --ring: 193 43% 67%;
+  }
+
+  /* Synthwave Theme */
+  .theme-synthwave {
+    --background: 275 60% 10%;
+    --foreground: 320 100% 90%;
+    --card: 275 50% 15%;
+    --card-foreground: 320 100% 90%;
+    --popover: 275 50% 15%;
+    --popover-foreground: 320 100% 90%;
+    --primary: 320 100% 60%;
+    --primary-foreground: 275 60% 10%;
+    --secondary: 275 40% 22%;
+    --secondary-foreground: 320 100% 90%;
+    --muted: 275 40% 22%;
+    --muted-foreground: 275 30% 65%;
+    --accent: 275 40% 22%;
+    --accent-foreground: 320 100% 90%;
+    --destructive: 0 100% 65%;
+    --border: 275 40% 26%;
+    --input: 275 40% 26%;
+    --ring: 320 100% 60%;
+  }
+
+  /* Monokai Theme */
+  .theme-monokai {
+    --background: 70 8% 15%;
+    --foreground: 60 30% 96%;
+    --card: 70 6% 20%;
+    --card-foreground: 60 30% 96%;
+    --popover: 70 6% 20%;
+    --popover-foreground: 60 30% 96%;
+    --primary: 82 85% 67%;
+    --primary-foreground: 70 8% 15%;
+    --secondary: 70 6% 25%;
+    --secondary-foreground: 60 30% 96%;
+    --muted: 70 6% 25%;
+    --muted-foreground: 70 5% 65%;
+    --accent: 70 6% 25%;
+    --accent-foreground: 60 30% 96%;
+    --destructive: 350 100% 65%;
+    --border: 70 6% 28%;
+    --input: 70 6% 28%;
+    --ring: 82 85% 67%;
+  }
+
+  /* GitHub Dark Theme */
+  .theme-github {
+    --background: 210 24% 9%;
+    --foreground: 210 17% 82%;
+    --card: 212 18% 13%;
+    --card-foreground: 210 17% 82%;
+    --popover: 212 18% 13%;
+    --popover-foreground: 210 17% 82%;
+    --primary: 212 92% 43%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 212 18% 18%;
+    --secondary-foreground: 210 17% 82%;
+    --muted: 212 18% 18%;
+    --muted-foreground: 212 12% 58%;
+    --accent: 212 18% 18%;
+    --accent-foreground: 210 17% 82%;
+    --destructive: 358 75% 59%;
+    --border: 212 18% 22%;
+    --input: 212 18% 22%;
+    --ring: 212 92% 43%;
+  }
+
+  /* Custom Accent Color Overrides */
+  [data-accent="blue"] { --primary: 217 91% 60%; --ring: 217 91% 60%; }
+  [data-accent="purple"] { --primary: 270 91% 65%; --ring: 270 91% 65%; }
+  [data-accent="emerald"] { --primary: 158 64% 52%; --ring: 158 64% 52%; }
+  [data-accent="amber"] { --primary: 38 92% 50%; --ring: 38 92% 50%; }
+  [data-accent="rose"] { --primary: 346 87% 65%; --ring: 346 87% 65%; }
+  [data-accent="cyan"] { --primary: 189 94% 43%; --ring: 189 94% 43%; }
 }
 
 @layer base {

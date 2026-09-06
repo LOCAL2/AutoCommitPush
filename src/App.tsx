@@ -11,22 +11,36 @@ import LogsPage from "@/pages/LogsPage";
 import SettingsPage from "@/pages/SettingsPage";
 
 function ThemeHandler() {
-  const { theme } = useSettingsStore();
+  const { theme, accentColor } = useSettingsStore();
 
   useEffect(() => {
     const root = document.documentElement;
-    const applyTheme = (dark: boolean) => root.classList.toggle("dark", dark);
+    
+    // Clean existing theme classes
+    root.classList.remove("dark", "theme-dracula", "theme-nord", "theme-synthwave", "theme-monokai", "theme-github");
 
     if (theme === "system") {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      applyTheme(mq.matches);
-      const handler = (e: MediaQueryListEvent) => applyTheme(e.matches);
+      root.classList.toggle("dark", mq.matches);
+      const handler = (e: MediaQueryListEvent) => root.classList.toggle("dark", e.matches);
       mq.addEventListener("change", handler);
       return () => mq.removeEventListener("change", handler);
+    } else if (theme === "light") {
+      // Light theme default
+    } else if (theme === "dark") {
+      root.classList.add("dark");
     } else {
-      applyTheme(theme === "dark");
+      // Theme preset (dracula, nord, synthwave, monokai, github)
+      root.classList.add(`theme-${theme}`);
     }
-  }, [theme]);
+
+    // Set custom accent color attribute
+    if (accentColor && accentColor !== "default") {
+      root.setAttribute("data-accent", accentColor);
+    } else {
+      root.removeAttribute("data-accent");
+    }
+  }, [theme, accentColor]);
 
   return null;
 }

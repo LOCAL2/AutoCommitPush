@@ -101,12 +101,32 @@ export interface LogEntry {
 }
 
 // ─── Settings ────────────────────────────────────────────────────────────────
-export type Theme = "dark" | "light" | "system";
+export type ThemePreset =
+  | "dark"
+  | "light"
+  | "dracula"
+  | "nord"
+  | "synthwave"
+  | "monokai"
+  | "github"
+  | "system";
+
+export type AccentColor =
+  | "default"
+  | "blue"
+  | "purple"
+  | "emerald"
+  | "amber"
+  | "rose"
+  | "cyan";
 
 export interface AppSettings {
   defaultCommitMessage: string;
   defaultPrivate: boolean;
-  theme: Theme;
+  theme: ThemePreset;
+  accentColor?: AccentColor;
+  bgImageUrl?: string;
+  bgOpacity?: number; // 0 to 1
   launchOnStartup: boolean;
   authorName: string;
   authorEmail: string;

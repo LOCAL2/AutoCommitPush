@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import {
   Moon, Sun, Monitor, LogOut, User, Container,
-  Eye, EyeOff, CheckCircle2, Sparkles,
+  Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -551,21 +551,147 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* ── Appearance ── */}
+      {/* ── Theme & Appearance ── */}
       <Card>
-        <CardHeader><CardTitle className="text-sm">Appearance</CardTitle></CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-2">
-            {themes.map((t) => (
-              <button key={t.value} onClick={() => { settings.setTheme(t.value); flashSaved(); }}
-                className={`flex items-center justify-center gap-2 rounded-md border p-3 text-sm transition-colors ${
-                  settings.theme === t.value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border hover:bg-muted"
-                }`}>
-                {t.icon} {t.label}
-              </button>
-            ))}
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Palette className="h-4 w-4 text-primary" /> Themes & Appearance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Theme Presets */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Theme Presets
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {[
+                { value: "dark", label: "Dark", bg: "bg-neutral-900 text-white" },
+                { value: "light", label: "Light", bg: "bg-white text-neutral-900 border-neutral-300" },
+                { value: "dracula", label: "Dracula", bg: "bg-[#282a36] text-[#ff79c6]" },
+                { value: "nord", label: "Nord", bg: "bg-[#2e3440] text-[#88c0d0]" },
+                { value: "synthwave", label: "Synthwave", bg: "bg-[#1a0933] text-[#ff71ce]" },
+                { value: "monokai", label: "Monokai", bg: "bg-[#272822] text-[#a6e22e]" },
+                { value: "github", label: "GitHub Dark", bg: "bg-[#0d1117] text-[#58a6ff]" },
+                { value: "system", label: "System", bg: "bg-muted text-foreground" },
+              ].map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => {
+                    settings.setTheme(t.value as any);
+                    flashSaved();
+                  }}
+                  className={cn(
+                    "flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-medium transition-all text-left",
+                    t.bg,
+                    settings.theme === t.value
+                      ? "ring-2 ring-primary border-transparent shadow-md scale-[1.02]"
+                      : "opacity-80 hover:opacity-100 border-border"
+                  )}
+                >
+                  <div className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0 bg-current" />
+                  <span className="truncate">{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Accent Color Selection */}
+          <div className="space-y-2 pt-2 border-t">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Custom Accent Color
+            </label>
+            <div className="flex flex-wrap gap-2.5">
+              {[
+                { value: "default", label: "Default", color: "bg-blue-500" },
+                { value: "blue", label: "Blue", color: "bg-blue-600" },
+                { value: "purple", label: "Purple", color: "bg-purple-600" },
+                { value: "emerald", label: "Emerald", color: "bg-emerald-500" },
+                { value: "amber", label: "Amber", color: "bg-amber-500" },
+                { value: "rose", label: "Rose", color: "bg-rose-500" },
+                { value: "cyan", label: "Cyan", color: "bg-cyan-500" },
+              ].map((a) => (
+                <button
+                  key={a.value}
+                  type="button"
+                  onClick={() => {
+                    settings.setAccentColor(a.value as any);
+                    flashSaved();
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all select-none",
+                    (settings.accentColor ?? "default") === a.value
+                      ? "border-primary bg-primary/10 text-primary font-semibold ring-1 ring-primary"
+                      : "border-border hover:bg-muted text-muted-foreground"
+                  )}
+                >
+                  <span className={cn("w-3 h-3 rounded-full shrink-0", a.color)} />
+                  <span>{a.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Background Image & Opacity */}
+          <div className="space-y-3 pt-2 border-t">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Custom App Background Image
+                </label>
+                <p className="text-[11px] text-muted-foreground">
+                  Set a custom background image URL or local file path
+                </p>
+              </div>
+              {settings.bgImageUrl && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs text-destructive hover:text-destructive"
+                  onClick={() => {
+                    settings.setBgImageUrl("");
+                    flashSaved();
+                  }}
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1" /> Clear Image
+                </Button>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              <Input
+                value={settings.bgImageUrl ?? ""}
+                onChange={(e) => {
+                  settings.setBgImageUrl(e.target.value);
+                  flashSaved();
+                }}
+                placeholder="Paste Image URL (e.g. https://images.unsplash.com/... or file:///...)"
+                className="text-xs font-mono"
+              />
+
+              {/* Opacity Slider */}
+              <div className="space-y-1.5 bg-muted/40 p-3 rounded-xl border">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium">Background Opacity</span>
+                  <span className="font-mono text-muted-foreground">
+                    {Math.round((settings.bgOpacity ?? 0.25) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.05"
+                  max="0.85"
+                  step="0.05"
+                  value={settings.bgOpacity ?? 0.25}
+                  onChange={(e) => {
+                    settings.setBgOpacity(parseFloat(e.target.value));
+                    flashSaved();
+                  }}
+                  className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
