@@ -510,14 +510,24 @@ function LocalTab() {
                   </div>
                 )}
 
-                {/* Not git repo */}
+                {/* Not git repo banner */}
                 {status && !status.is_git_repo && (
-                  <div className="mt-3 flex items-center gap-2 p-2 rounded-md bg-github-orange/10 border border-github-orange/20">
-                    <AlertCircle className="h-4 w-4 text-github-orange shrink-0" />
-                    <p className="text-xs text-github-orange flex-1">Not a Git repository</p>
-                    <Button size="sm" variant="outline" className="h-6 text-xs"
-                      onClick={() => handleInit(project.id, project.path, project.label)}>
-                      Initialize
+                  <div className="mt-3 flex items-center justify-between gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 shrink-0">
+                        <AlertCircle className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-amber-400 leading-tight">Not a Git Repository</p>
+                        <p className="text-[11px] text-amber-400/70 truncate">Initialize repository to start committing</p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleInit(project.id, project.path, project.label)}
+                      className="h-7 text-xs px-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold shadow-sm shrink-0 transition-colors"
+                    >
+                      Initialize Git
                     </Button>
                   </div>
                 )}
@@ -527,13 +537,23 @@ function LocalTab() {
                   <ChangesDiffPanel projectPath={project.path} status={status} />
                 )}
 
-                {/* No remote */}
+                {/* No remote banner */}
                 {status?.is_git_repo && !status.remote_url && (
-                  <div className="mt-2 flex items-center gap-2 p-2 rounded-md bg-github-blue/10 border border-github-blue/20">
-                    <AlertCircle className="h-4 w-4 text-github-blue shrink-0" />
-                    <p className="text-xs text-github-blue flex-1">No remote configured</p>
-                    <Button size="sm" variant="outline" className="h-6 text-xs"
-                      onClick={() => setCardState(project.id, { showCreateRepo: true })}>
+                  <div className="mt-3 flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 shrink-0">
+                        <AlertCircle className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-blue-400 leading-tight">No Remote Configured</p>
+                        <p className="text-[11px] text-blue-400/70 truncate">Connect to a GitHub repository to push</p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => setCardState(project.id, { showCreateRepo: true })}
+                      className="h-7 text-xs px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-sm shrink-0 transition-colors"
+                    >
                       Create Repo
                     </Button>
                   </div>
