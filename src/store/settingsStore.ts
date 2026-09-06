@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AppSettings, Theme } from "@/types";
 import type { AvatarFrameId } from "@/components/AvatarWithFrame";
+import { createTauriStorage } from "@/lib/tauriStorage";
 
 interface SettingsState extends AppSettings {
   avatarFrame: AvatarFrameId;
@@ -48,6 +49,9 @@ export const useSettingsStore = create<SettingsState>()(
         set({ dockerUsername, dockerPassword }),
       setDockerDefaultTag: (dockerDefaultTag) => set({ dockerDefaultTag }),
     }),
-    { name: "acp-settings" }
+    {
+      name: "acp-settings",
+      storage: createTauriStorage<SettingsState>(),
+    }
   )
 );

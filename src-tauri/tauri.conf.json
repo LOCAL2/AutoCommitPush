@@ -1,6 +1,6 @@
 {
   "productName": "AutoCommitPush",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "identifier": "com.autocommitpush.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -45,7 +45,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI2QkY1Qzg2NDE4NDMwMkEKUldRcU1JUkJobHkvdHYzejZSTnJ2T0s5Tm1Jd0tsNmVBUVRjMkdOeEZJMVZNTDN1V01kMkZYSkUK",
       "endpoints": [
-        "https://github.com/Woradet/AutoCommitPush/releases/latest/download/latest.json"
+        "https://github.com/LOCAL2/AutoCommitPush/releases/latest/download/latest.json"
       ]
     }
   }
