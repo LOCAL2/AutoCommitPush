@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Rocket, CheckCircle2 } from "lucide-react";
 import { fireConfettiCelebration } from "@/lib/confetti";
 
@@ -14,18 +14,22 @@ export default function SuccessRocketOverlay({
   onClose,
 }: SuccessRocketOverlayProps) {
   const [active, setActive] = useState(false);
+  const hasFiredRef = useRef(false);
 
   useEffect(() => {
-    if (show) {
+    if (show && !hasFiredRef.current) {
+      hasFiredRef.current = true;
       setActive(true);
       fireConfettiCelebration();
+
       const timer = setTimeout(() => {
         setActive(false);
         onClose();
+        hasFiredRef.current = false;
       }, 2500);
       return () => clearTimeout(timer);
     }
-  }, [show, onClose]);
+  }, [show]);
 
   if (!active && !show) return null;
 
