@@ -83,8 +83,8 @@ export default function PushConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs animate-dialog-overlay">
-      <div className="w-full max-w-2xl rounded-xl border bg-card shadow-xl animate-dialog-content p-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="w-full max-w-2xl rounded-xl border bg-card shadow-xl p-6 max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
