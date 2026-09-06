@@ -28,7 +28,6 @@ interface SettingsState extends AppSettings {
   setBgImageUrl: (url: string) => void;
   setBgOpacity: (opacity: number) => void;
   setAvatarFrame: (frame: AvatarFrameId) => void;
-  setAvatarFrame: (frame: AvatarFrameId) => void;
   setNameEffect: (effect: NameEffectId) => void;
   setAiProvider: (provider: "gemini" | "openai") => void;
   setGeminiApiKey: (key: string) => void;

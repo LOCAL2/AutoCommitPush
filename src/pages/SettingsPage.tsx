@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import {
-  Moon, Sun, Monitor, LogOut, User, Container,
+  Monitor, LogOut, User, Container,
   Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2, Upload, Crop,
 } from "lucide-react";
 import ImageCropDialog from "@/components/ImageCropDialog";
@@ -15,13 +15,6 @@ import { AvatarWithFrame, AVATAR_FRAMES } from "@/components/AvatarWithFrame";
 import { NameEffect, NAME_EFFECTS } from "@/components/NameEffect";
 import { testAiConnection } from "@/lib/ai-commit";
 import { cn } from "@/lib/utils";
-import type { Theme } from "@/types";
-
-const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
-  { value: "dark",   label: "Dark",   icon: <Moon className="h-4 w-4" /> },
-  { value: "light",  label: "Light",  icon: <Sun className="h-4 w-4" /> },
-  { value: "system", label: "System", icon: <Monitor className="h-4 w-4" /> },
-];
 
 // ─── Auto-save indicator ──────────────────────────────────────────────────────
 function AutoSaveBadge({ saved }: { saved: boolean }) {
