@@ -3,6 +3,7 @@ import { getVersion } from "@tauri-apps/api/app";
 import {
   Monitor, LogOut, User, Container,
   Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2, Upload, Crop,
+  Activity,
 } from "lucide-react";
 import ImageCropDialog from "@/components/ImageCropDialog";
 import { Button } from "@/components/ui/button";
@@ -345,9 +346,10 @@ export default function SettingsPage() {
               Test your AI API connection before pushing
             </span>
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               disabled={testingAi}
+              className="gap-2 w-32"
               onClick={async () => {
                 setTestingAi(true);
                 const currentKey =
@@ -367,7 +369,15 @@ export default function SettingsPage() {
                 }
               }}
             >
-              {testingAi ? "Testing..." : "⚡ Test Connection"}
+              {testingAi ? (
+                <>
+                  <Activity className="h-3.5 w-3.5 animate-pulse" /> Testing...
+                </>
+              ) : (
+                <>
+                  <Activity className="h-3.5 w-3.5" /> Test Connection
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
