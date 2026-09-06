@@ -555,40 +555,150 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Theme Presets */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Theme Presets
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Theme Presets
+                </label>
+                <p className="text-[11px] text-muted-foreground">Select a color scheme or sync with your system preference</p>
+              </div>
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 capitalize">
+                Current: {settings.theme}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { value: "dark", label: "Dark", bg: "bg-neutral-900 text-white" },
-                { value: "light", label: "Light", bg: "bg-white text-neutral-900 border-neutral-300" },
-                { value: "dracula", label: "Dracula", bg: "bg-[#282a36] text-[#ff79c6]" },
-                { value: "nord", label: "Nord", bg: "bg-[#2e3440] text-[#88c0d0]" },
-                { value: "synthwave", label: "Synthwave", bg: "bg-[#1a0933] text-[#ff71ce]" },
-                { value: "monokai", label: "Monokai", bg: "bg-[#272822] text-[#a6e22e]" },
-                { value: "github", label: "GitHub Dark", bg: "bg-[#0d1117] text-[#58a6ff]" },
-                { value: "system", label: "System", bg: "bg-muted text-foreground" },
-              ].map((t) => (
-                <button
-                  key={t.value}
-                  type="button"
-                  onClick={() => {
-                    settings.setTheme(t.value as any);
-                    flashSaved();
-                  }}
-                  className={cn(
-                    "flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-medium transition-all text-left",
-                    t.bg,
-                    settings.theme === t.value
-                      ? "ring-2 ring-primary border-transparent shadow-md scale-[1.02]"
-                      : "opacity-80 hover:opacity-100 border-border"
-                  )}
-                >
-                  <div className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0 bg-current" />
-                  <span className="truncate">{t.label}</span>
-                </button>
-              ))}
+                {
+                  value: "dark",
+                  label: "Dark (Default)",
+                  bg: "bg-[#0d1117]",
+                  border: "border-slate-800",
+                  text: "text-slate-200",
+                  primaryDot: "bg-emerald-500",
+                  secondaryDot: "bg-slate-700",
+                  accentDot: "bg-cyan-500",
+                  desc: "Classic dark theme with emerald green accents"
+                },
+                {
+                  value: "light",
+                  label: "Light Clean",
+                  bg: "bg-slate-50",
+                  border: "border-slate-300",
+                  text: "text-slate-900",
+                  primaryDot: "bg-emerald-600",
+                  secondaryDot: "bg-slate-200",
+                  accentDot: "bg-blue-600",
+                  desc: "Bright, clean, and crisp daytime appearance"
+                },
+                {
+                  value: "dracula",
+                  label: "Dracula Cyber",
+                  bg: "bg-[#282a36]",
+                  border: "border-purple-900/50",
+                  text: "text-[#f8f8f2]",
+                  primaryDot: "bg-[#ff79c6]",
+                  secondaryDot: "bg-[#44475a]",
+                  accentDot: "bg-[#8be9fd]",
+                  desc: "Famous vampire theme with vivid pink & cyan"
+                },
+                {
+                  value: "nord",
+                  label: "Nordic Frost",
+                  bg: "bg-[#2e3440]",
+                  border: "border-slate-700",
+                  text: "text-[#eceff4]",
+                  primaryDot: "bg-[#88c0d0]",
+                  secondaryDot: "bg-[#3b4252]",
+                  accentDot: "bg-[#81a1c1]",
+                  desc: "Arctic ice blue & calm neutral slate"
+                },
+                {
+                  value: "synthwave",
+                  label: "Synthwave 80s",
+                  bg: "bg-[#1a0933]",
+                  border: "border-fuchsia-900/50",
+                  text: "text-[#fdfdfd]",
+                  primaryDot: "bg-[#ff71ce]",
+                  secondaryDot: "bg-[#241442]",
+                  accentDot: "bg-[#05ffa1]",
+                  desc: "Retro neon 80s magenta & cyan arcade vibes"
+                },
+                {
+                  value: "monokai",
+                  label: "Monokai Pro",
+                  bg: "bg-[#272822]",
+                  border: "border-stone-800",
+                  text: "text-[#f8f8f2]",
+                  primaryDot: "bg-[#a6e22e]",
+                  secondaryDot: "bg-[#3e3d32]",
+                  accentDot: "bg-[#fd971f]",
+                  desc: "Iconic code editor colors with vibrant lime"
+                },
+                {
+                  value: "github",
+                  label: "GitHub Dark",
+                  bg: "bg-[#0d1117]",
+                  border: "border-gray-800",
+                  text: "text-[#c9d1d9]",
+                  primaryDot: "bg-[#58a6ff]",
+                  secondaryDot: "bg-[#161b22]",
+                  accentDot: "bg-[#3fb950]",
+                  desc: "Official GitHub Dark mode with blue highlights"
+                },
+                {
+                  value: "system",
+                  label: "System Auto",
+                  bg: "bg-muted/80",
+                  border: "border-border",
+                  text: "text-foreground",
+                  primaryDot: "bg-primary",
+                  secondaryDot: "bg-muted-foreground/30",
+                  accentDot: "bg-foreground/50",
+                  desc: "Automatically adapts to your Windows theme"
+                },
+              ].map((t) => {
+                const isSelected = settings.theme === t.value;
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => {
+                      settings.setTheme(t.value as any);
+                      flashSaved();
+                    }}
+                    className={cn(
+                      "flex flex-col justify-between p-3 rounded-xl border text-left transition-all relative overflow-hidden group select-none min-h-[96px]",
+                      t.bg,
+                      t.border,
+                      isSelected
+                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg scale-[1.03]"
+                        : "opacity-85 hover:opacity-100 hover:scale-[1.01] hover:border-primary/50"
+                    )}
+                  >
+                    <div className="flex items-center justify-between w-full mb-1.5">
+                      <span className={cn("text-xs font-semibold truncate", t.text)}>
+                        {t.label}
+                      </span>
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-primary shrink-0 animate-pulse" />
+                      )}
+                    </div>
+
+                    <p className={cn("text-[10px] line-clamp-2 mb-2 leading-relaxed opacity-80", t.text)}>
+                      {t.desc}
+                    </p>
+
+                    {/* Color Swatch Dots Preview */}
+                    <div className="flex items-center gap-1.5 mt-auto pt-1 border-t border-white/10">
+                      <div className={cn("w-3 h-3 rounded-full shadow-xs border border-white/20", t.primaryDot)} />
+                      <div className={cn("w-3 h-3 rounded-full shadow-xs border border-white/20", t.secondaryDot)} />
+                      <div className={cn("w-3 h-3 rounded-full shadow-xs border border-white/20", t.accentDot)} />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
