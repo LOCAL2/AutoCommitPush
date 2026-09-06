@@ -104,6 +104,41 @@
   animation: glitchAnim 0.8s ease-in-out infinite;
 }
 
+@keyframes rocketLaunch {
+  0% { transform: translateY(30px) scale(0.6) rotate(-15deg); opacity: 0; }
+  30% { transform: translateY(0) scale(1.1) rotate(0deg); opacity: 1; }
+  60% { transform: translateY(-10px) scale(1.05) rotate(5deg); }
+  100% { transform: translateY(-120px) scale(1.2) rotate(-5deg); opacity: 0; }
+}
+.animate-rocket-launch {
+  animation: rocketLaunch 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-scale-up {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Micro-interaction card hover & page transitions */
+.card-hover-effect {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+.card-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.15);
+}
+
+.page-transition {
+  animation: pageSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes pageSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Diff viewer */
 .diff-add {
   background: rgb(34 197 94 / 0.12);

@@ -207,7 +207,7 @@ function StatCard({
   small?: boolean;
 }) {
   return (
-    <Card>
+    <Card className="card-hover-effect transition-all">
       <CardContent className="p-4">
         <div className={`flex items-center gap-2 ${color} mb-2`}>
           {icon}

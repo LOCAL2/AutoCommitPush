@@ -31,7 +31,7 @@ import BranchManagerDialog from "@/components/BranchManagerDialog";
 import CommitHistoryDialog from "@/components/CommitHistoryDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import GitignoreEditor from "@/components/GitignoreEditor";
-import { useRepoWatcher } from "@/hooks/useRepoWatcher";
+import SuccessRocketOverlay from "@/components/SuccessRocketOverlay";
 
 import { NameEffect } from "@/components/NameEffect";
 
@@ -155,6 +155,7 @@ function LocalTab() {
   const [search, setSearch] = useState("");
   const [cardStates, setCardStates] = useState<Record<string, ProjectCardState>>({});
   const [showAddPicker, setShowAddPicker] = useState(false);
+  const [showSuccessRocket, setShowSuccessRocket] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<{
     id: string;
     label: string;
@@ -309,6 +310,7 @@ function LocalTab() {
       });
       addLog("success", `Push successful → ${branch}`, id, label);
       showToast("success", "Pushed successfully!");
+      setShowSuccessRocket(true);
       await loadStatus(id, path);
     } catch (e: any) {
       updateProject(id, { lastPushStatus: "error" });
@@ -386,7 +388,7 @@ function LocalTab() {
           const { status } = cs;
 
           return (
-            <Card key={project.id} className="hover:border-border/80 transition-colors">
+            <Card key={project.id} className="card-hover-effect transition-all">
               <CardContent className="p-4">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3">
@@ -741,6 +743,12 @@ function LocalTab() {
         onCancel={() => setShowAddPicker(false)}
       />
     )}
+
+    {/* ── Success Rocket & Confetti Overlay ── */}
+    <SuccessRocketOverlay
+      show={showSuccessRocket}
+      onClose={() => setShowSuccessRocket(false)}
+    />
   </>
   );
 }
