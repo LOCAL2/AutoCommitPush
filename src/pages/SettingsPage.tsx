@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import {
   Moon, Sun, Monitor, LogOut, User, Container,
-  Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2, Upload,
+  Eye, EyeOff, CheckCircle2, Sparkles, Palette, Trash2, Upload, Crop,
 } from "lucide-react";
+import ImageCropDialog from "@/components/ImageCropDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,7 @@ export default function SettingsPage() {
   const [appVersion, setAppVersion] = useState<string>("");
   const [showAiKey, setShowAiKey] = useState(false);
   const [testingAi, setTestingAi] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
     getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.8"));
@@ -634,6 +636,17 @@ export default function SettingsPage() {
                   placeholder="Paste Image URL or pick local file..."
                   className="text-xs font-mono flex-1"
                 />
+                {settings.bgImageUrl && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 text-xs gap-1.5"
+                    onClick={() => setCropImageSrc(settings.bgImageUrl)}
+                  >
+                    <Crop className="h-3.5 w-3.5" /> Crop Image
+                  </Button>
+                )}
                 <Button
                   type="button"
                   variant="outline"
@@ -649,9 +662,7 @@ export default function SettingsPage() {
                         const reader = new FileReader();
                         reader.onload = (re) => {
                           if (re.target?.result) {
-                            settings.setBgImageUrl(re.target.result as string);
-                            flashSaved();
-                            showToast("success", "Background image loaded successfully!");
+                            setCropImageSrc(re.target.result as string);
                           }
                         };
                         reader.readAsDataURL(file);
@@ -689,6 +700,20 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* ── Image Crop Dialog Modal ── */}
+      {cropImageSrc && (
+        <ImageCropDialog
+          imageSrc={cropImageSrc}
+          onCropComplete={(croppedDataUrl) => {
+            settings.setBgImageUrl(croppedDataUrl);
+            flashSaved();
+            showToast("success", "Background image cropped & saved!");
+            setCropImageSrc(null);
+          }}
+          onCancel={() => setCropImageSrc(null)}
+        />
+      )}
     </div>
   );
 }
