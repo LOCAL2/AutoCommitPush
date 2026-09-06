@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export type NameEffectId =
   | "none"
-  // Popular & Glowing
+  // Typing Effects (3)
+  | "typing_hacker"
+  | "typing_neon"
+  | "typing_rainbow"
+  // Popular & Glowing (10)
   | "rainbow_flow"
   | "neon_cyber"
   | "royal_gold"
@@ -18,12 +22,19 @@ export type NameEffectId =
 export interface NameEffectOption {
   id: NameEffectId;
   name: string;
-  category: "Popular" | "Gaming" | "Luxury" | "Sci-Fi";
+  category: "Typing" | "Popular" | "Gaming" | "Luxury" | "Sci-Fi";
   description: string;
 }
 
 export const NAME_EFFECTS: NameEffectOption[] = [
   { id: "none", name: "Default Normal", category: "Popular", description: "ข้อความสีมาตรฐานตามธีม" },
+
+  // Typing Effects (3)
+  { id: "typing_hacker", name: "Terminal Hacker Typing", category: "Typing", description: "แฮกเกอร์เทอร์มินัลพิมพ์ข้อความทีละตัวพร้อมเคอร์เซอร์กะพริบ" },
+  { id: "typing_neon", name: "Cyber Neon Typewriter", category: "Typing", description: "พิมพ์ตัวอักษรเรืองแสงนีออนฟ้า-ชมพูสตรีทไซเบอร์" },
+  { id: "typing_rainbow", name: "Rainbow Flow Typing", category: "Typing", description: "พิมพ์ตัวอักษรเกรเดียนท์สายรุ้งพิมพ์สด" },
+
+  // Glowing & Animated Effects (10)
   { id: "rainbow_flow", name: "Rainbow Flow", category: "Popular", description: "เกรเดียนท์สายรุ้งเคลื่อนไหวพริ้วไหว" },
   { id: "neon_cyber", name: "Neon Cyber Glow", category: "Gaming", description: "นีออนสีฟ้า-ชมพูเรืองแสงสไตล์เกมเมอร์" },
   { id: "royal_gold", name: "Imperial Gold Shimmer", category: "Luxury", description: "ทองคำบริสุทธิ์สะท้อนแสงพรีเมียม" },
@@ -35,6 +46,50 @@ export const NAME_EFFECTS: NameEffectOption[] = [
   { id: "synthwave_80s", name: "Synthwave Sunset", category: "Popular", description: "เกรเดียนท์พระอาทิตย์ตกดิสโก้ 80s" },
   { id: "sakura_pink", name: "Sakura Blossom Pink", category: "Popular", description: "กลีบซากุระชมพูหวานสดใสนุ่มนวล" },
 ];
+
+const TypewriterEffect: React.FC<{
+  text: string;
+  textClassName?: string;
+  cursorClassName?: string;
+  cursorChar?: string;
+}> = ({
+  text,
+  textClassName = "",
+  cursorClassName = "text-emerald-400 font-bold",
+  cursorChar = "_",
+}) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (!isDeleting && index <= text.length) {
+      setDisplayText(text.slice(0, index));
+      timer = setTimeout(() => setIndex((prev) => prev + 1), 140);
+    } else if (!isDeleting && index > text.length) {
+      timer = setTimeout(() => setIsDeleting(true), 2500);
+    } else if (isDeleting && index >= 0) {
+      setDisplayText(text.slice(0, index));
+      timer = setTimeout(() => setIndex((prev) => prev - 1), 70);
+    } else if (isDeleting && index < 0) {
+      setIsDeleting(false);
+      setIndex(0);
+    }
+
+    return () => clearTimeout(timer);
+  }, [text, index, isDeleting]);
+
+  return (
+    <span className={cn("inline-flex items-center select-none", textClassName)}>
+      <span>{displayText}</span>
+      <span className={cn("animate-pulse inline-block ml-0.5", cursorClassName)}>
+        {cursorChar}
+      </span>
+    </span>
+  );
+};
 
 interface NameEffectProps {
   text: string;
@@ -51,8 +106,42 @@ export const NameEffect: React.FC<NameEffectProps> = ({
     return <span className={className}>{text}</span>;
   }
 
-  const effectClasses: Record<NameEffectId, string> = {
-    none: "",
+  // ── Typing Effects ──
+  if (effectId === "typing_hacker") {
+    return (
+      <TypewriterEffect
+        text={text}
+        textClassName={cn("font-mono text-emerald-400 font-bold [text-shadow:0_0_6px_rgba(52,211,153,0.8)]", className)}
+        cursorClassName="text-emerald-400 font-mono font-bold"
+        cursorChar="_"
+      />
+    );
+  }
+
+  if (effectId === "typing_neon") {
+    return (
+      <TypewriterEffect
+        text={text}
+        textClassName={cn("font-medium text-cyan-300 [text-shadow:0_0_8px_rgba(34,211,238,0.9),0_0_15px_rgba(244,114,182,0.7)]", className)}
+        cursorClassName="text-pink-400 font-bold"
+        cursorChar="|"
+      />
+    );
+  }
+
+  if (effectId === "typing_rainbow") {
+    return (
+      <TypewriterEffect
+        text={text}
+        textClassName={cn("bg-gradient-to-r from-red-500 via-amber-400 via-emerald-400 via-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent animate-rainbow-flow font-semibold", className)}
+        cursorClassName="text-amber-400 font-bold"
+        cursorChar="▌"
+      />
+    );
+  }
+
+  // ── Animated & Gradient Glow Effects ──
+  const effectClasses: Record<string, string> = {
     rainbow_flow:
       "bg-gradient-to-r from-red-500 via-amber-400 via-emerald-400 via-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent animate-rainbow-flow font-semibold",
     neon_cyber:
