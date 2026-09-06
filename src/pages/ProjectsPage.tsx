@@ -32,6 +32,7 @@ import CommitHistoryDialog from "@/components/CommitHistoryDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import GitignoreEditor from "@/components/GitignoreEditor";
 import SuccessRocketOverlay from "@/components/SuccessRocketOverlay";
+import { useRepoWatcher } from "@/hooks/useRepoWatcher";
 
 import { NameEffect } from "@/components/NameEffect";
 
