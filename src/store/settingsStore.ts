@@ -1,14 +1,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AppSettings, Theme } from "@/types";
+import type { AvatarFrameId } from "@/components/AvatarWithFrame";
 
 interface SettingsState extends AppSettings {
+  avatarFrame: AvatarFrameId;
   // Docker Hub
   dockerUsername: string;
   dockerPassword: string;
   dockerDefaultTag: string;
   // Actions
   setTheme: (theme: Theme) => void;
+  setAvatarFrame: (frame: AvatarFrameId) => void;
   setDefaultCommitMessage: (msg: string) => void;
   setDefaultPrivate: (v: boolean) => void;
   setLaunchOnStartup: (v: boolean) => void;
@@ -21,6 +24,7 @@ interface SettingsState extends AppSettings {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
+      avatarFrame: "none",
       // Git / commit
       defaultCommitMessage: "Update project",
       defaultPrivate: false,
@@ -34,6 +38,7 @@ export const useSettingsStore = create<SettingsState>()(
       dockerDefaultTag: "latest",
 
       setTheme: (theme) => set({ theme }),
+      setAvatarFrame: (avatarFrame) => set({ avatarFrame }),
       setDefaultCommitMessage: (defaultCommitMessage) => set({ defaultCommitMessage }),
       setDefaultPrivate: (defaultPrivate) => set({ defaultPrivate }),
       setLaunchOnStartup: (launchOnStartup) => set({ launchOnStartup }),

@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FolderOpen, Plus, Trash2, Search,
   GitBranch, UploadCloud, AlertCircle, Check, X, RefreshCw,
-  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare, GitPullRequest, FileCode, MoreHorizontal,
+  Github, Lock, Unlock, Container, CheckCircle2, FileText, TerminalSquare, GitPullRequest, FileCode, MoreHorizontal, Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +12,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useProjectStore } from "@/store/projectStore";
 import { useAuthStore } from "@/store/authStore";
-import { useLogStore } from "@/store/logStore";
 import { useSettingsStore } from "@/store/settingsStore";
+import { AvatarWithFrame } from "@/components/AvatarWithFrame";
+import { useLogStore } from "@/store/logStore";
 import { useToast } from "@/components/ui/toast";
 import * as cmd from "@/lib/tauri-commands";
 import type { RepoStatus, GitHubRepo } from "@/types";
@@ -26,6 +28,7 @@ import ReadmeEditor from "@/components/ReadmeEditor";
 import FolderPicker from "@/components/FolderPicker";
 import TerminalDialog from "@/components/TerminalDialog";
 import BranchManagerDialog from "@/components/BranchManagerDialog";
+import CommitHistoryDialog from "@/components/CommitHistoryDialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import GitignoreEditor from "@/components/GitignoreEditor";
 import { useRepoWatcher } from "@/hooks/useRepoWatcher";
@@ -47,6 +50,7 @@ interface ProjectCardState {
   showTerminal: boolean;
   showBranch: boolean;
   showGitignore: boolean;
+  showHistory: boolean;
   showMore: boolean;
   hasConflict: boolean;
 }
@@ -57,7 +61,7 @@ function defaultCardState(): ProjectCardState {
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
     showPullConfirm: false, showReadme: false, showTerminal: false,
-    showBranch: false, showGitignore: false, showMore: false, hasConflict: false,
+    showBranch: false, showGitignore: false, showHistory: false, showMore: false, hasConflict: false,
   };
 }
 
@@ -65,9 +69,11 @@ type Tab = "local" | "github";
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ProjectsPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("local");
   const { user } = useAuthStore();
   const { token } = useAuthStore();
+  const { authorName, authorEmail } = useSettingsStore();
   const [repoCount, setRepoCount] = useState<number | null>(null);
 
   // Load actual repo count from API (includes private repos)
@@ -79,7 +85,24 @@ export default function ProjectsPage() {
   }, [token, user]);
 
   return (
-    <div className="flex flex-col h-full animate-fade-in">      {/* Tab bar */}
+    <div className="flex flex-col h-full animate-fade-in">
+      {/* Warning if Git Author is not configured */}
+      {(!authorName.trim() || !authorEmail.trim()) && (
+        <div className="bg-destructive/10 border-b border-destructive/20 px-6 py-3 flex items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
+            <div className="text-sm text-destructive/90">
+              <span className="font-semibold text-destructive">Git Author Missing: </span>
+              Please configure your Name and Email in Settings. Commits will fail without them.
+            </div>
+          </div>
+          <Button variant="destructive" size="sm" onClick={() => navigate("/settings")}>
+            Go to Settings
+          </Button>
+        </div>
+      )}
+
+      {/* Tab bar */}
       <div className="flex items-center gap-1 px-6 pt-5 pb-0 border-b">
         <TabButton active={tab === "local"} onClick={() => setTab("local")}>
           <FolderOpen className="h-4 w-4" /> Local Projects
@@ -186,6 +209,7 @@ function LocalTab() {
   };
 
   const doRemove = async (id: string, label: string, deleteGitHub: boolean) => {
+    const project = projects.find((p) => p.id === id);
     // Delete GitHub repo first if requested
     if (deleteGitHub && token && user) {
       const cs = cardStates[id];
@@ -195,6 +219,14 @@ function LocalTab() {
         const [, owner, repo] = match;
         await cmd.deleteGithubRepo(token, owner, repo);
         addLog("success", `Deleted GitHub repo: ${owner}/${repo}`, id, label);
+      }
+    }
+    if (deleteGitHub && project?.path) {
+      try {
+        await cmd.deleteLocalGit(project.path);
+        addLog("info", `Removed local .git folder`, id, label);
+      } catch (e) {
+        console.error("Failed to delete local .git folder", e);
       }
     }
     removeProject(id);
@@ -551,7 +583,12 @@ function LocalTab() {
                           className="fixed inset-0 z-10"
                           onClick={() => setCardState(project.id, { showMore: false })}
                         />
-                        <div className="absolute left-0 top-full mt-1 z-20 w-44 rounded-md border bg-popover shadow-md py-1 animate-fade-in">
+                        <div className="absolute left-0 bottom-full mb-1 z-20 w-44 rounded-md border bg-popover shadow-md py-1 animate-fade-in">
+                          <button
+                            onClick={() => { setCardState(project.id, { showMore: false, showHistory: true }); }}
+                            className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground">
+                            <Clock className="h-3.5 w-3.5 text-muted-foreground" /> Commit History
+                          </button>
                           <button
                             onClick={() => { setCardState(project.id, { showMore: false, showReadme: true }); }}
                             className="flex items-center gap-2.5 w-full px-3 py-1.5 text-sm hover:bg-muted transition-colors text-foreground">
@@ -641,6 +678,14 @@ function LocalTab() {
                 />
               )}
 
+              {cs.showHistory && (
+                <CommitHistoryDialog
+                  projectLabel={project.label}
+                  projectPath={project.path}
+                  onClose={() => setCardState(project.id, { showHistory: false })}
+                />
+              )}
+
               {cs.showTerminal && (
                 <TerminalDialog
                   projectLabel={project.label}
@@ -705,6 +750,7 @@ type SortKey = "updated" | "name" | "stars";
 
 function GitHubTab() {
   const { token, user } = useAuthStore();
+  const { avatarFrame } = useSettingsStore();
   const { addProject } = useProjectStore();
   const { showToast } = useToast();
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
@@ -786,8 +832,16 @@ function GitHubTab() {
     <div className="p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-3">
+          {user?.avatar_url && (
+            <AvatarWithFrame
+              src={user.avatar_url}
+              alt={user.login || "Avatar"}
+              size="sm"
+              frameId={avatarFrame}
+            />
+          )}
+          <p className="text-sm font-medium text-foreground">
             {user?.login}
           </p>
         </div>

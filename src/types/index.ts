@@ -24,6 +24,15 @@ export interface Project {
 }
 
 // ─── Repo Status ─────────────────────────────────────────────────────────────
+export interface CommitInfo {
+  hash: string;
+  message: string;
+  author_name: string;
+  author_email: string;
+  date: string;
+}
+
+
 export interface RepoStatus {
   is_git_repo: boolean;
   has_gitignore: boolean;

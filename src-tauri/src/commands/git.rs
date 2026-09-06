@@ -46,10 +46,30 @@ pub struct FileChange {
     pub is_staged: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CommitInfo {
+    pub hash: String,
+    pub message: String,
+    pub author_name: String,
+    pub author_email: String,
+    pub date: String,
+}
+
 #[command]
 pub fn init_repository(path: String) -> Result<String, String> {
     let _repo = Repository::init(&path).map_err(|e| e.to_string())?;
     Ok(format!("Repository initialized at {}", path))
+}
+
+#[command]
+pub fn delete_local_git(path: String) -> Result<String, String> {
+    let git_dir = Path::new(&path).join(".git");
+    if git_dir.exists() {
+        std::fs::remove_dir_all(&git_dir).map_err(|e| format!("Failed to remove .git folder: {}", e))?;
+        Ok(format!("Deleted .git directory at {}", path))
+    } else {
+        Ok("No .git directory found".to_string())
+    }
 }
 
 #[command]
@@ -810,4 +830,103 @@ pub fn force_push_to_remote(path: String, token: String, branch: String) -> Resu
         .map_err(|e| e.to_string())?;
 
     Ok(format!("Force push successful → {}", actual_branch))
+}
+
+#[command]
+pub fn get_commit_history(path: String, limit: u32) -> Result<Vec<CommitInfo>, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+    let mut revwalk = repo.revwalk().map_err(|e| e.to_string())?;
+    revwalk.push_head().map_err(|e| e.to_string())?;
+    
+    let mut commits = Vec::new();
+    for oid in revwalk.take(limit as usize) {
+        if let Ok(oid) = oid {
+            if let Ok(commit) = repo.find_commit(oid) {
+                let msg = commit.message().unwrap_or("").to_string();
+                let hash = commit.id().to_string();
+                let author = commit.author();
+                let author_name = author.name().unwrap_or("Unknown").to_string();
+                let author_email = author.email().unwrap_or("Unknown").to_string();
+                let date = chrono::DateTime::from_timestamp(commit.time().seconds(), 0)
+                    .map(|dt: chrono::DateTime<chrono::Utc>| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                    .unwrap_or_default();
+                commits.push(CommitInfo {
+                    hash,
+                    message: msg,
+                    author_name,
+                    author_email,
+                    date,
+                });
+            }
+        }
+    }
+    Ok(commits)
+}
+
+#[command]
+pub fn get_commit_diff(path: String, hash: String) -> Result<Vec<FileDiff>, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+    let oid = git2::Oid::from_str(&hash).map_err(|e| e.to_string())?;
+    let commit = repo.find_commit(oid).map_err(|e| e.to_string())?;
+    let tree = commit.tree().map_err(|e| e.to_string())?;
+    
+    let parent_tree = if commit.parent_count() > 0 {
+        let parent = commit.parent(0).map_err(|e| e.to_string())?;
+        Some(parent.tree().map_err(|e| e.to_string())?)
+    } else {
+        None
+    };
+    
+    let mut diff_opts = git2::DiffOptions::new();
+    diff_opts.force_text(true);
+    
+    let diff = repo.diff_tree_to_tree(
+        parent_tree.as_ref(),
+        Some(&tree),
+        Some(&mut diff_opts)
+    ).map_err(|e| e.to_string())?;
+    
+    let mut map: std::collections::HashMap<String, FileDiff> = std::collections::HashMap::new();
+
+    diff.print(git2::DiffFormat::Patch, |delta, _hunk, line| {
+        let file_path = delta
+            .new_file()
+            .path()
+            .or_else(|| delta.old_file().path())
+            .map(|p| normalize_git_path(&p.to_string_lossy()))
+            .unwrap_or_default();
+
+        if file_path.is_empty() {
+            return true;
+        }
+
+        let origin = line.origin();
+        if origin != '+' && origin != '-' && origin != ' ' {
+            return true;
+        }
+
+        let content = std::str::from_utf8(line.content()).unwrap_or("");
+        let entry = map.entry(file_path.clone()).or_insert_with(|| FileDiff {
+            path: file_path.clone(),
+            lines: Vec::new(),
+            additions: 0,
+            deletions: 0,
+        });
+
+        match origin {
+            '+' => entry.additions += 1,
+            '-' => entry.deletions += 1,
+            _ => {}
+        }
+        entry.lines.push(DiffLine {
+            origin: origin.to_string(),
+            content: content.trim_end_matches('\n').to_string(),
+            old_lineno: line.old_lineno(),
+            new_lineno: line.new_lineno(),
+        });
+        true
+    })
+    .map_err(|e| e.to_string())?;
+
+    Ok(map.into_values().collect())
 }

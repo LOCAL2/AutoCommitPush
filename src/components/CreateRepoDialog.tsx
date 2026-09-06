@@ -275,7 +275,7 @@ export default function CreateRepoDialog({
                 onClick={handleCreate}
                 loading={loading}
                 disabled={nameStatus !== "available"}
-                className="flex-1"
+                className="flex-1 text-white"
               >
                 <Github className="h-4 w-4" /> Create Repository
               </Button>

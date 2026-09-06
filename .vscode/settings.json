@@ -1,3 +1,7 @@
 {
-    "aiFileTracker.enabled": true
+    "aiFileTracker.enabled": true,
+    "rust-analyzer.server.extraEnv": {
+        "CARGO_TARGET_DIR": "${workspaceFolder}/src-tauri/target/analyzer"
+    },
+    "rust-analyzer.cargo.targetDir": "${workspaceFolder}/src-tauri/target/analyzer"
 }

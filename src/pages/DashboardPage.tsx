@@ -7,13 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useProjectStore } from "@/store/projectStore";
 import { useAuthStore } from "@/store/authStore";
+import { useSettingsStore } from "@/store/settingsStore";
+import { AvatarWithFrame } from "@/components/AvatarWithFrame";
 import { useLogStore } from "@/store/logStore";
 import { formatDate } from "@/lib/utils";
+import { GitHubCalendar } from "react-github-calendar";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 export default function DashboardPage() {
   const { projects } = useProjectStore();
   const { user } = useAuthStore();
+  const { avatarFrame } = useSettingsStore();
   const { logs } = useLogStore();
+  const { theme } = useSettingsStore();
 
   const totalProjects = projects.length;
   const pushedProjects = projects.filter((p) => p.lastPushedAt).length;
@@ -68,12 +75,13 @@ export default function DashboardPage() {
               <Activity className="h-4 w-4" /> GitHub Account
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <div className="flex items-center gap-4">
-              <img
+              <AvatarWithFrame
                 src={user.avatar_url}
                 alt={user.login}
-                className="w-12 h-12 rounded-full ring-2 ring-border"
+                size="lg"
+                frameId={avatarFrame}
               />
               <div>
                 <p className="font-medium">{user.name ?? user.login}</p>
@@ -87,6 +95,38 @@ export default function DashboardPage() {
                   </span>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* GitHub Contributions Graph */}
+      {user && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" /> Contribution Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto pb-2 flex justify-center">
+              <GitHubCalendar 
+                username={user.login} 
+                colorScheme={theme === "light" ? "light" : "dark"}
+                blockMargin={4}
+                blockSize={12}
+                fontSize={12}
+                renderBlock={(block, activity) => {
+                  const d = new Date(activity.date);
+                  const dateStr = d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+                  const text = `${activity.count} contributions on ${dateStr}.`;
+                  return React.cloneElement(block as React.ReactElement, {
+                    "data-tooltip-id": "react-tooltip",
+                    "data-tooltip-content": text,
+                  });
+                }}
+              />
+              <Tooltip id="react-tooltip" />
             </div>
           </CardContent>
         </Card>

@@ -15,8 +15,10 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             commands::git::init_repository,
+            commands::git::delete_local_git,
             commands::git::get_repo_status,
             commands::git::stage_all_files,
             commands::git::create_commit,
@@ -31,6 +33,8 @@ pub fn run() {
             commands::git::set_remote,
             commands::git::get_file_changes,
             commands::git::get_file_diff,
+            commands::git::get_commit_history,
+            commands::git::get_commit_diff,
             commands::git::clone_repository,
             commands::github::create_github_repo,
             commands::github::get_user_info,

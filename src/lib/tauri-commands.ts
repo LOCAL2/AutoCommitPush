@@ -6,6 +6,7 @@ import type {
   GitHubUser,
   GitHubRepo,
   CreateRepoParams,
+  CommitInfo,
 } from "@/types";
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -43,6 +44,9 @@ export const getLatestCommit = (token: string, fullName: string) =>
 export const initRepository = (path: string) =>
   invoke<string>("init_repository", { path });
 
+export const deleteLocalGit = (path: string) =>
+  invoke<string>("delete_local_git", { path });
+
 export const getRepoStatus = (path: string) =>
   invoke<RepoStatus>("get_repo_status", { path });
 
@@ -51,6 +55,12 @@ export const getFileChanges = (path: string) =>
 
 export const getFileDiff = (path: string, filePath?: string) =>
   invoke<FileDiff[]>("get_file_diff", { path, filePath: filePath ?? null });
+
+export const getCommitHistory = (path: string, limit: number = 50) =>
+  invoke<CommitInfo[]>("get_commit_history", { path, limit });
+
+export const getCommitDiff = (path: string, hash: string) =>
+  invoke<FileDiff[]>("get_commit_diff", { path, hash });
 
 export const watchProject = (projectId: string, path: string) =>
   invoke<void>("watch_project", { projectId, path });

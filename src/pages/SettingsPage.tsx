@@ -1,15 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Moon, Sun, Monitor, LogOut, User, Container,
   Eye, EyeOff, CheckCircle2,
 } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/toast";
+import { AvatarWithFrame, AVATAR_FRAMES } from "@/components/AvatarWithFrame";
+import { cn } from "@/lib/utils";
 import type { Theme } from "@/types";
 
 const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
@@ -30,6 +31,8 @@ function AutoSaveBadge({ saved }: { saved: boolean }) {
 
 export default function SettingsPage() {
   const settings = useSettingsStore();
+  const { avatarFrame, setAvatarFrame } = useSettingsStore();
+  const [frameCategory, setFrameCategory] = useState<"All" | "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic">("All");
   const { user, logout } = useAuthStore();
   const { showToast } = useToast();
 
@@ -67,21 +70,25 @@ export default function SettingsPage() {
         <AutoSaveBadge saved={savedFlash} />
       </div>
 
-      {/* ── Account ── */}
+      {/* ── Account & Avatar Customization ── */}
       {user && (
         <Card>
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
-              <User className="h-4 w-4" /> Account
+              <User className="h-4 w-4" /> Account & Profile Frame
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <img src={user.avatar_url} alt={user.login}
-                  className="w-10 h-10 rounded-full ring-2 ring-border" />
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between gap-3 pb-4 border-b">
+              <div className="flex items-center gap-4">
+                <AvatarWithFrame
+                  src={user.avatar_url}
+                  alt={user.login}
+                  size="xl"
+                  frameId={avatarFrame}
+                />
                 <div>
-                  <p className="font-medium text-sm">{user.name ?? user.login}</p>
+                  <p className="font-semibold text-base">{user.name ?? user.login}</p>
                   <p className="text-xs text-muted-foreground">@{user.login}</p>
                 </div>
               </div>
@@ -91,9 +98,115 @@ export default function SettingsPage() {
                 <LogOut className="h-4 w-4" /> Sign Out
               </Button>
             </div>
+
+            {/* Frame Picker */}
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium">Avatar Profile Frames</h4>
+                <p className="text-xs text-muted-foreground">Select a custom border glow effect for your profile picture</p>
+              </div>
+
+              {/* Category Filter Tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                {(["All", "Sci-Fi", "Fantasy", "Luxury", "Cosmic", "Aesthetic"] as const).map((cat) => {
+                  const isActive = frameCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setFrameCategory(cat)}
+                      className={cn(
+                        "px-3 py-1 rounded-lg text-xs font-medium transition-all shrink-0 select-none",
+                        isActive
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                {AVATAR_FRAMES.filter((f) => frameCategory === "All" || f.category === frameCategory).map((frame) => {
+                  const isSelected = avatarFrame === frame.id;
+                  return (
+                    <button
+                      key={frame.id}
+                      type="button"
+                      onClick={() => {
+                        setAvatarFrame(frame.id);
+                        showToast("success", `Frame changed to ${frame.name}`);
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
+                          : "border-border hover:bg-muted/50 hover:border-muted-foreground/30"
+                      )}
+                    >
+                      <AvatarWithFrame
+                        src={user.avatar_url}
+                        alt={frame.name}
+                        size="md"
+                        frameId={frame.id}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-medium truncate">{frame.name}</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate">{frame.description}</p>
+                      </div>
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
+
+      {/* ── App Updates ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Monitor className="h-4 w-4" /> App Updates
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Check for Updates</p>
+              <p className="text-xs text-muted-foreground">Download the latest version</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const { check } = await import("@tauri-apps/plugin-updater");
+                  const update = await check();
+                  if (update) {
+                    showToast("info", `Update v${update.version} available. Downloading...`);
+                    await update.downloadAndInstall();
+                    showToast("success", "Update installed. Please restart the app.");
+                  } else {
+                    showToast("success", "You are on the latest version.");
+                  }
+                } catch (err: any) {
+                  showToast("error", `Update failed: ${err.message || String(err)}`);
+                }
+              }}
+            >
+              Check Now
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* ── Git Author ── */}
       <Card>
@@ -242,11 +355,11 @@ export default function SettingsPage() {
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
     <button onClick={() => onChange(!value)}
-      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-        value ? "bg-primary" : "bg-secondary"
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors ${
+        value ? "bg-primary" : "bg-input"
       }`}>
-      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-        value ? "translate-x-4" : "translate-x-1"
+      <span className={`pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform ${
+        value ? "translate-x-4" : "translate-x-0"
       }`} />
     </button>
   );

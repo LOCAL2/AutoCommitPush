@@ -4,6 +4,8 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useProjectStore } from "@/store/projectStore";
+import { useSettingsStore } from "@/store/settingsStore";
+import { AvatarWithFrame } from "@/components/AvatarWithFrame";
 
 const navItems = [
   { to: "/", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" },
@@ -15,6 +17,7 @@ const navItems = [
 export default function Sidebar() {
   const { user } = useAuthStore();
   const { projects } = useProjectStore();
+  const { avatarFrame } = useSettingsStore();
 
   return (
     <aside className="w-52 shrink-0 flex flex-col border-r bg-card h-screen">
@@ -58,10 +61,11 @@ export default function Sidebar() {
       {user && (
         <div className="p-3 border-t">
           <div className="flex items-center gap-2.5">
-            <img
+            <AvatarWithFrame
               src={user.avatar_url}
               alt={user.login}
-              className="w-7 h-7 rounded-full ring-1 ring-border"
+              size="sm"
+              frameId={avatarFrame}
             />
             <div className="min-w-0">
               <p className="text-xs font-medium truncate">{user.name ?? user.login}</p>
