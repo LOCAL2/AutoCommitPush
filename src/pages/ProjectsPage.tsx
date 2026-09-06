@@ -643,94 +643,149 @@ function LocalTab() {
                 </div>
               </CardContent>
 
-              {cs.showPushConfirm && cs.status && (
-                <PushConfirmDialog
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  status={cs.status}
-                  onConfirm={(msg) => doPush(project.id, project.path, project.label, msg)}
-                  onCancel={() => setCardState(project.id, { showPushConfirm: false })}
-                />
-              )}
-
-              {cs.showCreateRepo && (
-                <CreateRepoDialog
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  projectId={project.id}
-                  onClose={() => setCardState(project.id, { showCreateRepo: false })}
-                  onSuccess={async () => {
-                    setCardState(project.id, { showCreateRepo: false });
-                    await loadStatus(project.id, project.path);
-                  }}
-                />
-              )}
-
-              {cs.showDockerPush && (
-                <DockerPushDialog
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  projectId={project.id}
-                  onClose={() => setCardState(project.id, { showDockerPush: false })}
-                />
-              )}
-
-              {cs.showReadme && (
-                <ReadmeEditor
-                  projectPath={project.path}
-                  projectLabel={project.label}
-                  onClose={() => setCardState(project.id, { showReadme: false })}
-                />
-              )}
-
-              {cs.showGitignore && (
-                <GitignoreEditor
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  onClose={() => setCardState(project.id, { showGitignore: false })}
-                />
-              )}
-
-              {cs.showHistory && (
-                <CommitHistoryDialog
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  onClose={() => setCardState(project.id, { showHistory: false })}
-                />
-              )}
-
-              {cs.showTerminal && (
-                <TerminalDialog
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  onClose={() => setCardState(project.id, { showTerminal: false })}
-                />
-              )}
-
-              {cs.showBranch && cs.status && (
-                <BranchManagerDialog
-                  projectLabel={project.label}
-                  projectPath={project.path}
-                  currentBranch={cs.status.branch ?? "main"}
-                  onBranchSwitch={() => loadStatus(project.id, project.path)}
-                  onClose={() => setCardState(project.id, { showBranch: false })}
-                />
-              )}
-
-              {cs.showPullConfirm && (
-                <ConfirmDialog
-                  title="Pull from Remote"
-                  message={`Pull latest changes from remote into "${project.label}" (${cs.status?.branch ?? "main"})?`}
-                  confirmLabel="Pull"
-                  onConfirm={() => doPull(project.id, project.path, project.label)}
-                  onCancel={() => setCardState(project.id, { showPullConfirm: false })}
-                />
-              )}
             </Card>
           );
         })}
       </div>
     </div>
+
+    {/* ── Push Confirm Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showPushConfirm || !cs.status) return null;
+      return (
+        <PushConfirmDialog
+          key={`push-confirm-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          status={cs.status}
+          onConfirm={(msg) => doPush(project.id, project.path, project.label, msg)}
+          onCancel={() => setCardState(project.id, { showPushConfirm: false })}
+        />
+      );
+    })}
+
+    {/* ── Create Repo Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showCreateRepo) return null;
+      return (
+        <CreateRepoDialog
+          key={`create-repo-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          projectId={project.id}
+          onClose={() => setCardState(project.id, { showCreateRepo: false })}
+          onSuccess={async () => {
+            setCardState(project.id, { showCreateRepo: false });
+            await loadStatus(project.id, project.path);
+          }}
+        />
+      );
+    })}
+
+    {/* ── Docker Push Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showDockerPush) return null;
+      return (
+        <DockerPushDialog
+          key={`docker-push-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          projectId={project.id}
+          onClose={() => setCardState(project.id, { showDockerPush: false })}
+        />
+      );
+    })}
+
+    {/* ── Readme Editor (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showReadme) return null;
+      return (
+        <ReadmeEditor
+          key={`readme-${project.id}`}
+          projectPath={project.path}
+          projectLabel={project.label}
+          onClose={() => setCardState(project.id, { showReadme: false })}
+        />
+      );
+    })}
+
+    {/* ── Gitignore Editor (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showGitignore) return null;
+      return (
+        <GitignoreEditor
+          key={`gitignore-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          onClose={() => setCardState(project.id, { showGitignore: false })}
+        />
+      );
+    })}
+
+    {/* ── Commit History Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showHistory) return null;
+      return (
+        <CommitHistoryDialog
+          key={`history-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          onClose={() => setCardState(project.id, { showHistory: false })}
+        />
+      );
+    })}
+
+    {/* ── Terminal Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showTerminal) return null;
+      return (
+        <TerminalDialog
+          key={`terminal-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          onClose={() => setCardState(project.id, { showTerminal: false })}
+        />
+      );
+    })}
+
+    {/* ── Branch Manager Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showBranch || !cs.status) return null;
+      return (
+        <BranchManagerDialog
+          key={`branch-${project.id}`}
+          projectLabel={project.label}
+          projectPath={project.path}
+          currentBranch={cs.status.branch ?? "main"}
+          onBranchSwitch={() => loadStatus(project.id, project.path)}
+          onClose={() => setCardState(project.id, { showBranch: false })}
+        />
+      );
+    })}
+
+    {/* ── Pull Confirm Dialog (Root Level Render) ── */}
+    {projects.map((project) => {
+      const cs = cardStates[project.id];
+      if (!cs?.showPullConfirm) return null;
+      return (
+        <ConfirmDialog
+          key={`pull-confirm-${project.id}`}
+          title="Pull from Remote"
+          message={`Pull latest changes from remote into "${project.label}" (${cs.status?.branch ?? "main"})?`}
+          confirmLabel="Pull"
+          onConfirm={() => doPull(project.id, project.path, project.label)}
+          onCancel={() => setCardState(project.id, { showPullConfirm: false })}
+        />
+      );
+    })}
 
     {/* ── Confirm Remove Dialog ── */}
     {confirmRemove && (
