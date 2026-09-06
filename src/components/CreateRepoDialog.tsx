@@ -147,10 +147,10 @@ export default function CreateRepoDialog({
           </button>
         </div>
 
-        <div className="p-5 space-y-4.5 max-h-[80vh] overflow-y-auto">
+        <div className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
           {/* Name Input */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Repository Name <span className="text-destructive">*</span></label>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground block">Repository Name <span className="text-destructive">*</span></label>
             <Input
               value={name}
               onChange={(e) => { setName(sanitizeRepoName(e.target.value)); setError(null); }}
@@ -163,7 +163,7 @@ export default function CreateRepoDialog({
                   : ""
               }`}
             />
-            <div className="text-xs space-y-0.5 pt-0.5">
+            <div className="text-xs space-y-1 pt-1">
               {user && (
                 <p className="text-muted-foreground">
                   github.com/{user.login}/<span className="text-foreground font-mono font-medium">{name || "..."}</span>
@@ -175,12 +175,12 @@ export default function CreateRepoDialog({
 
           {/* "Already exists" action panel */}
           {nameStatus === "taken" && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3.5 space-y-3">
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3 my-2">
               <p className="text-sm font-medium text-amber-400 flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 Repository already exists on your account
               </p>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 {/* Option 1: use existing */}
                 <button
                   onClick={handleUseExisting}
@@ -215,8 +215,8 @@ export default function CreateRepoDialog({
           )}
 
           {/* Description Input */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Description <span className="text-muted-foreground/60 font-normal">(optional)</span></label>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground block">Description <span className="text-muted-foreground/60 font-normal">(optional)</span></label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -226,15 +226,15 @@ export default function CreateRepoDialog({
           </div>
 
           {/* Visibility Selector Buttons */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Repository Visibility</label>
-            <div className="grid grid-cols-2 gap-2.5">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground block">Repository Visibility</label>
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setIsPrivate(false)}
                 className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
                   !isPrivate
-                    ? "border-primary bg-primary/10 text-primary shadow-xs"
+                    ? "border-primary bg-primary/10 text-primary shadow-xs font-semibold"
                     : "border-border/80 bg-muted/20 text-muted-foreground hover:bg-muted/50"
                 }`}
               >
@@ -245,7 +245,7 @@ export default function CreateRepoDialog({
                 onClick={() => setIsPrivate(true)}
                 className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
                   isPrivate
-                    ? "border-primary bg-primary/10 text-primary shadow-xs"
+                    ? "border-primary bg-primary/10 text-primary shadow-xs font-semibold"
                     : "border-border/80 bg-muted/20 text-muted-foreground hover:bg-muted/50"
                 }`}
               >
@@ -255,9 +255,9 @@ export default function CreateRepoDialog({
           </div>
 
           {/* Auto Init Switch */}
-          <div className="flex items-center justify-between p-3.5 rounded-xl border bg-muted/20">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+          <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/20">
+            <div className="flex items-center gap-2.5 text-sm font-medium text-foreground">
+              <BookOpen className="h-4.5 w-4.5 text-muted-foreground shrink-0" />
               Initialize with README
             </div>
             <button
