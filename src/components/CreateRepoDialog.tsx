@@ -127,30 +127,35 @@ export default function CreateRepoDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-xl border bg-card shadow-xl animate-fade-in p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card shadow-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <Github className="h-5 w-5" />
-            <h2 className="font-semibold">Create GitHub Repository</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b bg-muted/20">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
+              <Github className="h-4.5 w-4.5" />
+            </div>
+            <h2 className="font-semibold text-base text-foreground">Create GitHub Repository</h2>
           </div>
-          <button onClick={onClose} disabled={loading}
-            className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40">
-            <X className="h-5 w-5" />
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted/50 disabled:opacity-40"
+          >
+            <X className="h-4.5 w-4.5" />
           </button>
         </div>
 
-        <div className="space-y-4">
-          {/* Name */}
+        <div className="p-5 space-y-4.5 max-h-[80vh] overflow-y-auto">
+          {/* Name Input */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Repository Name *</label>
+            <label className="text-sm font-medium text-foreground">Repository Name <span className="text-destructive">*</span></label>
             <Input
               value={name}
               onChange={(e) => { setName(sanitizeRepoName(e.target.value)); setError(null); }}
               placeholder="my-awesome-project"
-              className={`font-mono ${
+              className={`font-mono text-sm ${
                 nameStatus === "taken" || nameStatus === "invalid"
                   ? "border-destructive focus-visible:ring-destructive"
                   : nameStatus === "available"
@@ -158,10 +163,10 @@ export default function CreateRepoDialog({
                   : ""
               }`}
             />
-            <div className="text-xs space-y-0.5">
+            <div className="text-xs space-y-0.5 pt-0.5">
               {user && (
                 <p className="text-muted-foreground">
-                  github.com/{user.login}/<span className="text-foreground font-mono">{name || "..."}</span>
+                  github.com/{user.login}/<span className="text-foreground font-mono font-medium">{name || "..."}</span>
                 </p>
               )}
               {nameHint()}
@@ -170,23 +175,23 @@ export default function CreateRepoDialog({
 
           {/* "Already exists" action panel */}
           {nameStatus === "taken" && (
-            <div className="rounded-lg border border-github-orange/30 bg-github-orange/5 p-3 space-y-3">
-              <p className="text-xs font-medium text-github-orange flex items-center gap-1.5">
-                <AlertCircle className="h-3.5 w-3.5" />
-                Repository already exists. What would you like to do?
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3.5 space-y-3">
+              <p className="text-sm font-medium text-amber-400 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                Repository already exists on your account
               </p>
               <div className="flex flex-col gap-2">
                 {/* Option 1: use existing */}
                 <button
                   onClick={handleUseExisting}
                   disabled={loading}
-                  className="flex items-start gap-3 p-2.5 rounded-md border border-border bg-card hover:bg-muted/50 transition-colors text-left disabled:opacity-50"
+                  className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:bg-muted/60 transition-colors text-left disabled:opacity-50"
                 >
-                  <Link className="h-4 w-4 text-github-blue shrink-0 mt-0.5" />
+                  <Link className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium">Use existing repo</p>
-                    <p className="text-xs text-muted-foreground">
-                      Link this local project to the existing GitHub repo. No data is deleted.
+                    <p className="text-sm font-medium text-foreground">Link Existing Repository</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Connect this local folder to the existing GitHub repo without deleting data.
                     </p>
                   </div>
                 </button>
@@ -195,14 +200,13 @@ export default function CreateRepoDialog({
                 <button
                   onClick={handleDeleteAndRecreate}
                   disabled={loading}
-                  className="flex items-start gap-3 p-2.5 rounded-md border border-destructive/30 bg-card hover:bg-destructive/5 transition-colors text-left disabled:opacity-50"
+                  className="flex items-start gap-3 p-3 rounded-xl border border-destructive/30 bg-card hover:bg-destructive/10 transition-colors text-left disabled:opacity-50"
                 >
                   <Trash2 className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-destructive">Delete &amp; recreate</p>
-                    <p className="text-xs text-muted-foreground">
-                      Permanently delete the existing GitHub repo and create a fresh one.
-                      <span className="text-destructive"> This cannot be undone.</span>
+                    <p className="text-sm font-medium text-destructive">Recreate Repository</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Permanently delete the existing remote GitHub repo and create a fresh one.
                     </p>
                   </div>
                 </button>
@@ -210,85 +214,103 @@ export default function CreateRepoDialog({
             </div>
           )}
 
-          {/* Description */}
+          {/* Description Input */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Description (optional)</label>
-            <Input value={description} onChange={(e) => setDescription(e.target.value)}
-              placeholder="Short description..." />
+            <label className="text-sm font-medium text-foreground">Description <span className="text-muted-foreground/60 font-normal">(optional)</span></label>
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Short project description..."
+              className="text-sm"
+            />
           </div>
 
-          {/* Visibility */}
-          <div className="flex gap-2">
-            <button onClick={() => setIsPrivate(false)}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-md border p-3 text-sm transition-colors ${
-                !isPrivate ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-muted"
-              }`}>
-              <Unlock className="h-4 w-4" /> Public
-            </button>
-            <button onClick={() => setIsPrivate(true)}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-md border p-3 text-sm transition-colors ${
-                isPrivate ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-muted"
-              }`}>
-              <Lock className="h-4 w-4" /> Private
-            </button>
+          {/* Visibility Selector Buttons */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Repository Visibility</label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsPrivate(false)}
+                className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
+                  !isPrivate
+                    ? "border-primary bg-primary/10 text-primary shadow-xs"
+                    : "border-border/80 bg-muted/20 text-muted-foreground hover:bg-muted/50"
+                }`}
+              >
+                <Unlock className="h-4 w-4" /> Public
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPrivate(true)}
+                className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
+                  isPrivate
+                    ? "border-primary bg-primary/10 text-primary shadow-xs"
+                    : "border-border/80 bg-muted/20 text-muted-foreground hover:bg-muted/50"
+                }`}
+              >
+                <Lock className="h-4 w-4" /> Private
+              </button>
+            </div>
           </div>
 
-          {/* Auto init */}
-          <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-            <div className="flex items-center gap-2 text-sm">
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
+          {/* Auto Init Switch */}
+          <div className="flex items-center justify-between p-3.5 rounded-xl border bg-muted/20">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
               Initialize with README
             </div>
-            <button onClick={() => setAutoInit(!autoInit)}
+            <button
+              type="button"
+              onClick={() => setAutoInit(!autoInit)}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                 autoInit ? "bg-primary" : "bg-muted-foreground/30"
-              }`}>
-              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                autoInit ? "translate-x-4" : "translate-x-1"
-              }`} />
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                  autoInit ? "translate-x-4" : "translate-x-1"
+                }`}
+              />
             </button>
           </div>
 
-          {/* Error */}
+          {/* Error Banner */}
           {error && (
-            <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20">
-              <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-              <p className="text-sm text-destructive break-all">{error}</p>
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs text-destructive">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+              <p className="break-all">{error}</p>
             </div>
           )}
 
-          {/* Loading */}
+          {/* Loading Indicator */}
           {loading && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Processing...
+            <div className="flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              Processing repository creation...
             </div>
           )}
+        </div>
 
-          {/* Main actions — only shown when name is available */}
+        {/* Footer Action Buttons */}
+        <div className="flex gap-2.5 px-5 py-3.5 border-t bg-muted/20">
+          <Button variant="outline" size="sm" onClick={onClose} disabled={loading} className="flex-1 rounded-xl">
+            Cancel
+          </Button>
+
           {nameStatus !== "taken" && (
-            <div className="flex gap-2 pt-1">
-              <Button variant="outline" onClick={onClose} disabled={loading} className="flex-1">
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCreate}
-                loading={loading}
-                disabled={nameStatus !== "available"}
-                className="flex-1 text-white"
-              >
-                <Github className="h-4 w-4" /> Create Repository
-              </Button>
-            </div>
-          )}
-
-          {/* Cancel when "taken" panel is shown */}
-          {nameStatus === "taken" && (
-            <Button variant="outline" onClick={onClose} disabled={loading} className="w-full">
-              Cancel
+            <Button
+              size="sm"
+              onClick={handleCreate}
+              loading={loading}
+              disabled={nameStatus !== "available"}
+              className="flex-1 rounded-xl text-white font-semibold shadow-sm"
+            >
+              <Github className="h-4 w-4" /> Create Repository
             </Button>
           )}
         </div>
+
       </div>
     </div>
   );
