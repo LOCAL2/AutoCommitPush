@@ -46,3 +46,4 @@ jobs:
           releaseBody: 'See the assets to download the latest version of AutoCommitPush.'
           releaseDraft: false
           prerelease: false
+          includeUpdaterJson: true
