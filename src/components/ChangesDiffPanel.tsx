@@ -152,10 +152,13 @@ export default function ChangesDiffPanel({ projectPath, status, onDiffCache }: P
       );
     }
 
-    // Re-fetch diffs in background — cache is updated in-place so no flash
-    entries.forEach((entry) => {
-      if (entry.type !== "Deleted") loadDiff(entry.path);
-    });
+    // Re-fetch diffs in background after modal finishes mount & paint
+    const timer = setTimeout(() => {
+      entries.forEach((entry) => {
+        if (entry.type !== "Deleted") loadDiff(entry.path);
+      });
+    }, 0);
+    return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, loadDiff]);
 
