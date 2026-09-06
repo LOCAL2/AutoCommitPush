@@ -283,7 +283,7 @@ export default function SettingsPage() {
                   key={p}
                   type="button"
                   onClick={() => {
-                    settings.setAiSettings(p, settings.aiApiKey);
+                    settings.setAiProvider(p);
                     flashSaved();
                   }}
                   className={cn(
@@ -309,9 +309,17 @@ export default function SettingsPage() {
             <div className="relative">
               <Input
                 type={showAiKey ? "text" : "password"}
-                value={settings.aiApiKey}
+                value={
+                  settings.aiProvider === "gemini"
+                    ? settings.geminiApiKey ?? ""
+                    : settings.openaiApiKey ?? ""
+                }
                 onChange={(e) => {
-                  settings.setAiSettings(settings.aiProvider, e.target.value);
+                  if (settings.aiProvider === "gemini") {
+                    settings.setGeminiApiKey(e.target.value);
+                  } else {
+                    settings.setOpenAiApiKey(e.target.value);
+                  }
                   flashSaved();
                 }}
                 placeholder={
@@ -330,8 +338,8 @@ export default function SettingsPage() {
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              {settings.aiApiKey
-                ? "Custom API Key saved. Used for AI Commit Message generation."
+              {(settings.aiProvider === "gemini" ? settings.geminiApiKey : settings.openaiApiKey)
+                ? `Custom ${settings.aiProvider === "gemini" ? "Gemini" : "OpenAI"} API Key saved.`
                 : "Leave blank to use free built-in fallback."}
             </p>
           </div>
@@ -346,9 +354,13 @@ export default function SettingsPage() {
               disabled={testingAi}
               onClick={async () => {
                 setTestingAi(true);
+                const currentKey =
+                  settings.aiProvider === "gemini"
+                    ? settings.geminiApiKey
+                    : settings.openaiApiKey;
                 try {
                   const sampleMsg = await testAiConnection(
-                    settings.aiApiKey,
+                    currentKey,
                     settings.aiProvider
                   );
                   showToast("success", `Connection Success! Test response: "${sampleMsg}"`);

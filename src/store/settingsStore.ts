@@ -10,6 +10,9 @@ interface SettingsState extends AppSettings {
   nameEffect: NameEffectId;
   // AI Settings
   aiProvider: "gemini" | "openai";
+  geminiApiKey: string;
+  openaiApiKey: string;
+  // Legacy getter fallback helper
   aiApiKey: string;
   // Docker Hub
   dockerUsername: string;
@@ -19,6 +22,9 @@ interface SettingsState extends AppSettings {
   setTheme: (theme: Theme) => void;
   setAvatarFrame: (frame: AvatarFrameId) => void;
   setNameEffect: (effect: NameEffectId) => void;
+  setAiProvider: (provider: "gemini" | "openai") => void;
+  setGeminiApiKey: (key: string) => void;
+  setOpenAiApiKey: (key: string) => void;
   setAiSettings: (provider: "gemini" | "openai", apiKey: string) => void;
   setDefaultCommitMessage: (msg: string) => void;
   setDefaultPrivate: (v: boolean) => void;
@@ -31,12 +37,17 @@ interface SettingsState extends AppSettings {
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       avatarFrame: "none",
       nameEffect: "none",
       // AI
       aiProvider: "gemini",
-      aiApiKey: "",
+      geminiApiKey: "",
+      openaiApiKey: "",
+      get aiApiKey() {
+        const state = get();
+        return state.aiProvider === "gemini" ? state.geminiApiKey : state.openaiApiKey;
+      },
       // Git / commit
       defaultCommitMessage: "Update project",
       defaultPrivate: false,
@@ -52,7 +63,15 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) => set({ theme }),
       setAvatarFrame: (avatarFrame) => set({ avatarFrame }),
       setNameEffect: (nameEffect) => set({ nameEffect }),
-      setAiSettings: (aiProvider, aiApiKey) => set({ aiProvider, aiApiKey }),
+      setAiProvider: (aiProvider) => set({ aiProvider }),
+      setGeminiApiKey: (geminiApiKey) => set({ geminiApiKey }),
+      setOpenAiApiKey: (openaiApiKey) => set({ openaiApiKey }),
+      setAiSettings: (aiProvider, apiKey) =>
+        set((state) => ({
+          aiProvider,
+          geminiApiKey: aiProvider === "gemini" ? apiKey : state.geminiApiKey,
+          openaiApiKey: aiProvider === "openai" ? apiKey : state.openaiApiKey,
+        })),
       setDefaultCommitMessage: (defaultCommitMessage) => set({ defaultCommitMessage }),
       setDefaultPrivate: (defaultPrivate) => set({ defaultPrivate }),
       setLaunchOnStartup: (launchOnStartup) => set({ launchOnStartup }),
