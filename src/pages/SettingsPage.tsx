@@ -415,17 +415,10 @@ export default function SettingsPage() {
               size="sm"
               onClick={async () => {
                 try {
-                  const { check } = await import("@tauri-apps/plugin-updater");
-                  const update = await check();
-                  if (update) {
-                    showToast("info", `Update v${update.version} available. Downloading...`);
-                    await update.downloadAndInstall();
-                    showToast("success", "Update installed. Please restart the app.");
-                  } else {
-                    showToast("success", "You are on the latest version.");
-                  }
-                } catch (err: any) {
-                  showToast("error", `Update failed: ${err.message || String(err)}`);
+                  const { invoke } = await import("@tauri-apps/api/core");
+                  await invoke("plugin:shell|open", { path: "https://github.com/LOCAL2/AutoCommitPush/releases" });
+                } catch {
+                  window.open("https://github.com/LOCAL2/AutoCommitPush/releases", "_blank");
                 }
               }}
             >
