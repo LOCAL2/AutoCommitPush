@@ -1,6 +1,6 @@
 {
   "productName": "AutoCommitPush",
-  "version": "1.0.55",
+  "version": "1.0.56",
   "identifier": "com.autocommitpush.app",
   "build": {
     "beforeDevCommand": "npm run dev",
