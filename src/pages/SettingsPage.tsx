@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { getVersion } from "@tauri-apps/api/app";
 import {
   Moon, Sun, Monitor, LogOut, User, Container,
   Eye, EyeOff, CheckCircle2,
@@ -35,6 +36,11 @@ export default function SettingsPage() {
   const [frameCategory, setFrameCategory] = useState<"All" | "Sci-Fi" | "Fantasy" | "Luxury" | "Cosmic" | "Aesthetic">("All");
   const { user, logout } = useAuthStore();
   const { showToast } = useToast();
+  const [appVersion, setAppVersion] = useState<string>("");
+
+  useEffect(() => {
+    getVersion().then(setAppVersion).catch(() => setAppVersion("1.0.6"));
+  }, []);
 
   // Auto-save flash indicator
   const [savedFlash, setSavedFlash] = useState(false);
@@ -181,7 +187,9 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">Check for Updates</p>
-              <p className="text-xs text-muted-foreground">Download the latest version</p>
+              <p className="text-xs text-muted-foreground">
+                Current Version: <span className="font-mono text-foreground font-semibold">{appVersion ? `v${appVersion}` : "..."}</span>
+              </p>
             </div>
             <Button
               variant="outline"
