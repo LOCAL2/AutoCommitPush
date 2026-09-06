@@ -267,6 +267,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-amber-400" /> AI Commit Generator Settings
+            <span className="px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500 text-[10px] font-bold uppercase tracking-wider">Beta</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">

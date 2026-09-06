@@ -196,8 +196,8 @@ const TypewriterEffect: React.FC<{
   }, [text, index, isDeleting]);
 
   return (
-    <span className={cn("inline-flex items-center select-none", textClassName)}>
-      <span>{displayText}</span>
+    <span className={cn("inline select-none", textClassName)}>
+      <span>{displayText || '\u200B'}</span>
       <span className={cn("animate-pulse inline-block ml-0.5", cursorClassName)}>
         {cursorChar}
       </span>
