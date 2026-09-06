@@ -311,7 +311,9 @@ function LocalTab() {
       });
       addLog("success", `Push successful → ${branch}`, id, label);
       showToast("success", "Pushed successfully!");
-      setShowSuccessRocket(true);
+      if (useSettingsStore.getState().enablePushSuccessOverlay ?? true) {
+        setShowSuccessRocket(true);
+      }
       await loadStatus(id, path);
     } catch (e: any) {
       updateProject(id, { lastPushStatus: "error" });

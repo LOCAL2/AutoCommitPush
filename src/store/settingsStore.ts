@@ -21,7 +21,8 @@ interface SettingsState extends AppSettings {
   // Docker Hub
   dockerUsername: string;
   dockerPassword: string;
-  dockerDefaultTag: string;
+  enablePushSuccessOverlay: boolean;
+  setEnablePushSuccessOverlay: (v: boolean) => void;
   // Actions
   setTheme: (theme: ThemePreset) => void;
   setAccentColor: (accent: AccentColor) => void;
@@ -62,6 +63,7 @@ export const useSettingsStore = create<SettingsState>()(
       accentColor: "default",
       bgImageUrl: "",
       bgOpacity: 0.05,
+      enablePushSuccessOverlay: true,
       launchOnStartup: false,
       authorName: "",
       authorEmail: "",
@@ -74,6 +76,7 @@ export const useSettingsStore = create<SettingsState>()(
       setAccentColor: (accentColor) => set({ accentColor }),
       setBgImageUrl: (bgImageUrl) => set({ bgImageUrl }),
       setBgOpacity: (bgOpacity) => set({ bgOpacity }),
+      setEnablePushSuccessOverlay: (enablePushSuccessOverlay) => set({ enablePushSuccessOverlay }),
       setAvatarFrame: (avatarFrame) => set({ avatarFrame }),
       setNameEffect: (nameEffect) => set({ nameEffect }),
       setAiProvider: (aiProvider) => set({ aiProvider }),

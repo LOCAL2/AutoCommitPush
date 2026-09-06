@@ -472,6 +472,32 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* ── Push Success Celebration Banner ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-emerald-400" /> Push Success Notification Banner
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium">Show Success Overlay Banner</p>
+              <p className="text-xs text-muted-foreground">
+                แสดงป้ายแจ้งเตือนมินิมอล "Push Successful!" กลางหน้าจอเมื่อ Push โค้ดไปยัง GitHub สำเร็จ (Default: เปิดใช้งาน)
+              </p>
+            </div>
+            <Toggle
+              value={settings.enablePushSuccessOverlay ?? true}
+              onChange={(v) => {
+                settings.setEnablePushSuccessOverlay(v);
+                flashSaved();
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ── Repository ── */}
       <Card>
         <CardHeader><CardTitle className="text-sm">Repository Defaults</CardTitle></CardHeader>

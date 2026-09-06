@@ -127,6 +127,7 @@ export interface AppSettings {
   accentColor?: AccentColor;
   bgImageUrl?: string;
   bgOpacity?: number; // 0 to 1
+  enablePushSuccessOverlay?: boolean;
   launchOnStartup: boolean;
   authorName: string;
   authorEmail: string;
