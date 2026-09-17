@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import type {
   RepoStatus,
+  RemoteSyncStatus,
   FileChange,
   FileDiff,
   GitHubUser,
@@ -86,6 +87,9 @@ export const forcePushToRemote = (path: string, token: string, branch: string) =
 
 export const pullFromRemote = (path: string, token: string, branch: string) =>
   invoke<string>("pull_from_remote", { path, token, branch });
+
+export const checkRemoteStatus = (path: string, token: string, branch: string) =>
+  invoke<RemoteSyncStatus>("check_remote_status", { path, token, branch });
 
 export const getBranches = (path: string) =>
   invoke<string[]>("get_branches", { path });

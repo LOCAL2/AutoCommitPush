@@ -24,6 +24,7 @@ pub fn run() {
             commands::git::push_to_remote,
             commands::git::force_push_to_remote,
             commands::git::pull_from_remote,
+            commands::git::check_remote_status,
             commands::git::get_branches,
             commands::git::create_branch,
             commands::git::switch_branch,

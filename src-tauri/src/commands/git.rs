@@ -55,6 +55,13 @@ pub struct CommitInfo {
     pub date: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RemoteSyncStatus {
+    pub ahead: usize,
+    pub behind: usize,
+    pub is_behind: bool,
+}
+
 #[command]
 pub fn init_repository(path: String) -> Result<String, String> {
     let _repo = Repository::init(&path).map_err(|e| e.to_string())?;
@@ -676,6 +683,36 @@ pub fn pull_from_remote(path: String, token: String, branch: String) -> Result<S
     } else {
         Err("Cannot fast-forward. Please resolve conflicts manually.".to_string())
     }
+}
+
+#[command]
+pub fn check_remote_status(path: String, token: String, branch: String) -> Result<RemoteSyncStatus, String> {
+    let repo = Repository::open(&path).map_err(|e| e.to_string())?;
+    let mut remote = repo.find_remote("origin").map_err(|e| e.to_string())?;
+
+    let mut callbacks = RemoteCallbacks::new();
+    let token_clone = token.clone();
+    callbacks.credentials(move |_url, _username, _allowed| {
+        Cred::userpass_plaintext(&token_clone, "")
+    });
+
+    let mut fetch_opts = FetchOptions::new();
+    fetch_opts.remote_callbacks(callbacks);
+
+    remote
+        .fetch(&[&branch], Some(&mut fetch_opts), None)
+        .map_err(|e| e.to_string())?;
+
+    let local_head = repo.head().map_err(|e| e.to_string())?.target().ok_or("Local HEAD has no target")?;
+    let fetch_head = repo.find_reference("FETCH_HEAD").map_err(|e| e.to_string())?.target().ok_or("FETCH_HEAD has no target")?;
+
+    let (ahead, behind) = repo.graph_ahead_behind(local_head, fetch_head).map_err(|e| e.to_string())?;
+
+    Ok(RemoteSyncStatus {
+        ahead,
+        behind,
+        is_behind: behind > 0,
+    })
 }
 
 #[command]

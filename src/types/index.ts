@@ -33,6 +33,12 @@ export interface CommitInfo {
 }
 
 
+export interface RemoteSyncStatus {
+  ahead: number;
+  behind: number;
+  is_behind: boolean;
+}
+
 export interface RepoStatus {
   is_git_repo: boolean;
   has_gitignore: boolean;

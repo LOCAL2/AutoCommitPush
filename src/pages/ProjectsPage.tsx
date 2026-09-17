@@ -17,7 +17,7 @@ import { AvatarWithFrame } from "@/components/AvatarWithFrame";
 import { useLogStore } from "@/store/logStore";
 import { useToast } from "@/components/ui/toast";
 import * as cmd from "@/lib/tauri-commands";
-import type { RepoStatus, GitHubRepo } from "@/types";
+import type { RepoStatus, RemoteSyncStatus, GitHubRepo } from "@/types";
 import { truncatePath, formatDate } from "@/lib/utils";
 import CreateRepoDialog from "@/components/CreateRepoDialog";
 import DockerPushDialog from "@/components/DockerPushDialog";
@@ -39,6 +39,7 @@ import { NameEffect } from "@/components/NameEffect";
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ProjectCardState {
   status: RepoStatus | null;
+  remoteSyncStatus: RemoteSyncStatus | null;
   loading: boolean;
   pushing: boolean;
   pulling: boolean;
@@ -60,7 +61,7 @@ interface ProjectCardState {
 
 function defaultCardState(): ProjectCardState {
   return {
-    status: null, loading: false, pushing: false, pulling: false,
+    status: null, remoteSyncStatus: null, loading: false, pushing: false, pulling: false,
     pushProgress: 0, editingLabel: false, tempLabel: "",
     showCreateRepo: false, showDockerPush: false, showPushConfirm: false,
     showPullConfirm: false, showReadme: false, showTerminal: false,
@@ -181,6 +182,18 @@ function LocalTab() {
     try {
       const status = await cmd.getRepoStatus(path);
       setCardState(id, { status, loading: false });
+
+      const token = useAuthStore.getState().token;
+      if (status.is_git_repo && status.remote_url && token) {
+        const branch = status.branch || "main";
+        cmd.checkRemoteStatus(path, token, branch)
+          .then((sync) => {
+            setCardState(id, { remoteSyncStatus: sync });
+          })
+          .catch(() => {
+            // ignore remote sync error if offline/unauthorized
+          });
+      }
     } catch {
       if (!silent) setCardState(id, { loading: false });
     }
@@ -559,6 +572,34 @@ function LocalTab() {
                   </div>
                 )}
 
+                {/* Remote Behind Banner (Collaborator updates available) */}
+                {status?.is_git_repo && status.remote_url && cs.remoteSyncStatus?.is_behind && (
+                  <div className="mt-3 flex items-center justify-between gap-3 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 animate-fade-in">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 shrink-0">
+                        <GitPullRequest className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-purple-300 leading-tight flex items-center gap-1.5">
+                          มีอัปเดตใหม่จาก GitHub
+                          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-purple-500/30 text-purple-200">
+                            Behind by {cs.remoteSyncStatus.behind} commit{cs.remoteSyncStatus.behind > 1 ? "s" : ""}
+                          </span>
+                        </p>
+                        <p className="text-[11px] text-purple-400/80 truncate">เพื่อนหรือ Collaborator ได้ทำการอัปเดตโค้ดใหม่บน GitHub</p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      loading={cs.pulling}
+                      onClick={() => handlePull(project.id, project.path, project.label)}
+                      className="h-7 text-xs px-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-sm shrink-0 transition-colors gap-1.5"
+                    >
+                      <GitPullRequest className="h-3.5 w-3.5" /> Pull (ดึงโค้ดล่าสุด)
+                    </Button>
+                  </div>
+                )}
+
                 {/* Push progress */}
                 {cs.pushing && cs.pushProgress > 0 && (
                   <div className="mt-3 space-y-1">
@@ -597,8 +638,18 @@ function LocalTab() {
                     loading={cs.pulling}
                     disabled={!status?.is_git_repo || !status?.remote_url || cs.pushing}
                     onClick={() => handlePull(project.id, project.path, project.label)}
-                    className="text-github-blue hover:text-github-blue border-github-blue/30 hover:border-github-blue">
+                    className={`gap-1.5 ${
+                      cs.remoteSyncStatus?.is_behind
+                        ? "text-purple-300 border-purple-500/50 bg-purple-500/10 hover:bg-purple-500/20 font-medium"
+                        : "text-github-blue hover:text-github-blue border-github-blue/30 hover:border-github-blue"
+                    }`}>
                     <GitPullRequest className="h-4 w-4" />
+                    <span>Pull</span>
+                    {cs.remoteSyncStatus?.is_behind && (
+                      <span className="px-1.5 py-0.2 text-[10px] bg-purple-500/30 rounded-full font-semibold">
+                        {cs.remoteSyncStatus.behind}
+                      </span>
+                    )}
                   </Button>
 
                   {/* ── More dropdown ── */}
