@@ -403,54 +403,6 @@ export default function SettingsPage() {
               {appVersion ? `v${appVersion}` : "..."}
             </span>
           </div>
-
-          <div className="border-t border-border/50" />
-
-          {/* Check for Updates Row */}
-          <div className="flex items-center justify-between py-1">
-            <div>
-              <p className="text-sm font-medium">Check for Updates</p>
-              <p className="text-xs text-muted-foreground">Auto-download and silent update in background</p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  showToast("info", "Checking for latest release...");
-                  const res = await fetch("https://api.github.com/repos/LOCAL2/AutoCommitPush/releases/latest");
-                  if (!res.ok) throw new Error("Could not fetch release info");
-                  const data = await res.json();
-                  const latestVersion = data.tag_name ? data.tag_name.replace(/^v/, "") : null;
-                  
-                  if (latestVersion && appVersion && latestVersion !== appVersion) {
-                    // Find setup exe asset url
-                    const exeAsset = data.assets?.find((a: any) => a.name.endsWith(".exe"));
-                    const downloadUrl = exeAsset?.browser_download_url;
-
-                    if (downloadUrl) {
-                      showToast("info", `Downloading v${latestVersion} update in background...`);
-                      const { invoke } = await import("@tauri-apps/api/core");
-                      await invoke("install_update_silently", {
-                        downloadUrl,
-                        version: latestVersion,
-                      });
-                      showToast("success", `v${latestVersion} installed! Please restart the app to apply update.`);
-                    } else {
-                      const { invoke } = await import("@tauri-apps/api/core");
-                      await invoke("plugin:shell|open", { path: data.html_url || "https://github.com/LOCAL2/AutoCommitPush/releases" });
-                    }
-                  } else {
-                    showToast("success", `You are on the latest version (v${appVersion || latestVersion}).`);
-                  }
-                } catch (err: any) {
-                  showToast("error", `Update check failed: ${err.message || String(err)}`);
-                }
-              }}
-            >
-              Check Now
-            </Button>
-          </div>
         </CardContent>
       </Card>
 
